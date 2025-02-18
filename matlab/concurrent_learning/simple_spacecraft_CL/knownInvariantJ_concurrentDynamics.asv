@@ -1,0 +1,165 @@
+function [dxdt, U] = knownInvariantJ_concurrentDynamics(t, x, A, B, Ar, Br, J, m, Theta, K, Kr, P, Gamma, ...
+    adaptive_on, CL_on, p_bar, CL_point_accept_epsilon, CL_gain, dt, integration_phase)
+    global point_added min_sv;
+    persistent Delta_stack;
+    persistent Phi_stack;
+    persistent Phi_last_point_stored;
+    persistent p;
+    persistent current_index_for_cyclic_stack;    
+    persistent rk4_counter;
+    % Unpack states from state vector x
+    x = reshape(x, [length(x) 1]);
+    sigma = x(1:3);
+    sigma_dot = x(4:6);
+    xr = x(7:12);
+    theta_hat = x(13:15);
+
+    x = x(1:6);
+
+    % Desired trajectory
+    % r = [0.5; 0.5; 0.5;  0; 0; 0;]; % temp
+    % 
+    % if (t < 10)
+        r = zeros(6,1);
+    % else
+    %     r = [0.1*ones(3,1); zeros(3,1)];
+    % end
+    % 
+
+    % Error Signal
+    e = x - xr; 
+
+    % Kinematics
+    G = CalcMRP_Matrix(sigma);
+    G_dot = 0.5 * (skew(sigma_dot) + sigma_dot*sigma' + sigma*sigma_dot' - sigma_dot'*sigma*eye(3));
+    omega = G\sigma_dot; %inv(G) * sigma_dot = body rates
+
+    % Unknown torque offset 
+    g_inertial = [0; 0; 9.81]; % gravity vector in inertial frame
+    DCM = eye(3) + (8*skew(sigma)^2 - 4*(1 - sigma'*sigma)*skew(sigma)) / (1 + sigma'*sigma)^2;
+    g_body = DCM * g_inertial; % gravity vector in body frame
+    Phi = m*skew(g_body);
+    Theta_map = kron(Theta', eye(3));
+    % Delta = Theta_map * Phi(:)
+    % System matrices in dynamics
+    invG = inv(G); % precalculate because we use this a lot
+    H = invG' * J * invG;
+    F = G_dot*omega - H\invG'*skew(omega)*J*omega;
+    L = H\inv(G');
+    Delta = Phi*Theta;
+
+    % Control signal
+    u = L \ (-F + K*x + Kr*r) + adaptive_on*Phi*theta_hat;
+    
+    % Precalculate dynamics just because we use them in the CL scheme below
+    xdot = A*x + B*(F + L*Delta + L*u);
+
+
+    %% Concurrent learning
+    if (isempty(Phi_last_point_stored)) % initialize if we are just starting
+        Phi_last_point_stored = Phi(:);
+        p = 0;
+        current_index_for_cyclic_stack = 1;
+        rk4_counter = 0;
+    end
+
+%% Concurrent learning data selection algorithm
+if (integration_phase  && (mod(rk4_counter, 4)==0) )  % only do this if integrating not backsolving since global vars get messed up 
+    new_stack = [Phi_stack, Phi(:)];
+    if (  ( norm(Phi(:) - Phi_last_point_stored)^2 / norm(Phi(:)) >= CL_point_accept_epsilon)  || (rank(new_stack) > rank(Phi_stack))) 
+
+        Delta_j = L\ pinv(B) * (xdot - A*x - B*F) - u;
+
+        if (p < p_bar) % Initilization, record more data until p_bar points
+            p = p+1;
+            current_index_for_cyclic_stack = p;
+            Delta_stack(:, p) = Delta_j;
+            Phi_stack(:, p) = Phi(:);
+
+            Phi_last_point_stored = Phi(:);
+            point_added = [point_added t];
+        else
+
+            % Cyclic history stack
+            [Phi_stack, ~] = updateHistoryStack(Phi_stack, current_index_for_cyclic_stack, Phi(:), p_bar);
+            [Delta_stack, current_index_for_cyclic_stack] = updateHistoryStack(Delta_stack, current_index_for_cyclic_stack, Delta, p_bar);
+
+            % MinSVD Maximization Algorithm (activates after p_bar points)
+            % Now we only add new points if it makes our minimum singular value (msv) increase
+            % T = X; % temp storage of X
+            % S_min_old = min(svd(X, "vector")); % get the current minimum singular values
+            % 
+            % S = zeros([p 1]); % preallocate to hold all new min sv that we are going to test
+            % for j = 1:p 
+            %     % iterate through each column in X and replace it with the new data point. 
+            %     % calculate and store the new minimum singular value for comparison later
+            %     X(:,j) = x;
+            %     S(j) = min(svd(X,"vector")); %store calculated min sing value
+            %     X = T; % restore X back to its original value for the next iteration
+            % end
+            % 
+            % [max_S, max_S_idx] = max(S); 
+            % if (max_S > S_min_old) % if any new combinations increase our minimum SV
+            %     X(:,max_S_idx) = x; % store new x if we have increased our SV
+            %     R(:,max_S_idx) = r;
+            %     X_dot(:,max_S_idx) = xdot;
+            %     U(:,max_S_idx) = u;
+            %     x_last_point_stored = x;
+            %     point_added = [point_added t];
+            % end
+        end 
+
+    end % sufficient change or adding data check end
+end
+
+    %% Concurrent learning error signals 
+    concurrent_learning_Delta = zeros(3,1); % initialize sum to zero
+    epsilon_Delta = zeros(3,p);
+    for j = 1:p
+        Delta_j = Delta_stack(:,j); % jth delta from storage
+        Phi_j = reshape(Phi_stack(:, j), 3, 3); % jth phi matrix from storage
+
+        epsilon_Delta(:,j) = Phi_j*theta_hat - Delta_j; % units of meters actually
+
+        concurrent_learning_Delta = concurrent_learning_Delta + Phi_j*epsilon_Delta(:,j);  
+    end
+    
+    if t > 20
+        summation = zeros(3,3);
+        for j = 1:p
+            Phi_j = reshape(Phi_stack(:, j), 3, 3); % jth phi matrix from storage
+            summation = summation + Phi_j;
+
+            block_phi(:,j) = summart
+        end
+        s_vec = summation(:);
+    end
+   
+    % Dynamics
+    pxdot = A*x + B*(F - L*Delta + L*u);
+    xr_dot = Ar*xr + Br*r;
+    theta_hat_dot = -Gamma*Phi'*L'*B'*P'*e + CL_on*CL_gain*concurrent_learning_Delta;
+
+    dxdt = [xdot; xr_dot; theta_hat_dot]; 
+
+    U = [omega', u']; % for post simulation analysis
+
+    
+  % Record the MinSVD
+    if (integration_phase && (mod(rk4_counter, 4)==0) && (rank(Phi_stack) > 1) )
+        min_svd = min(svd(Phi_stack,"vector"));
+        if isempty(min_svd)
+            min_sv = [min_sv 0];
+        else
+            min_sv =  [min_sv min_svd];
+        end
+    end
+
+    rk4_counter = rk4_counter + 1;
+
+    % helper for cyclic stack
+    function [history, currentIndex] = updateHistoryStack(history, currentIndex, newElement, p_bar)
+        history(:,currentIndex) = newElement;    % Insert the new element at the current index
+        currentIndex = mod(currentIndex, p_bar) + 1;     % Update the current index in a cyclic manner
+    end
+end
