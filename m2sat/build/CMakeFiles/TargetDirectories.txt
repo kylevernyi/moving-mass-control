@@ -1,0 +1,10 @@
+/home/kyle/school/s25/mmc/m2sat/build/CMakeFiles/proto_py.dir
+/home/kyle/school/s25/mmc/m2sat/build/CMakeFiles/m2sat.dir
+/home/kyle/school/s25/mmc/m2sat/build/CMakeFiles/edit_cache.dir
+/home/kyle/school/s25/mmc/m2sat/build/CMakeFiles/rebuild_cache.dir
+/home/kyle/school/s25/mmc/m2sat/build/controllers/CMakeFiles/controllers.dir
+/home/kyle/school/s25/mmc/m2sat/build/controllers/CMakeFiles/edit_cache.dir
+/home/kyle/school/s25/mmc/m2sat/build/controllers/CMakeFiles/rebuild_cache.dir
+/home/kyle/school/s25/mmc/m2sat/build/libvncxx/CMakeFiles/libvncxx.dir
+/home/kyle/school/s25/mmc/m2sat/build/libvncxx/CMakeFiles/edit_cache.dir
+/home/kyle/school/s25/mmc/m2sat/build/libvncxx/CMakeFiles/rebuild_cache.dir

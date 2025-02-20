@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "core": "cpp",
+        "geometry": "cpp"
+    },
+    "python.analysis.extraPaths": [
+        "./build/proto"
+    ]
+}

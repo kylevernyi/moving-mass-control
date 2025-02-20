@@ -1,0 +1,3 @@
+/home/kyle/school/s25/mmc/m2sat/controllers/build/CMakeFiles/controllers.dir
+/home/kyle/school/s25/mmc/m2sat/controllers/build/CMakeFiles/edit_cache.dir
+/home/kyle/school/s25/mmc/m2sat/controllers/build/CMakeFiles/rebuild_cache.dir

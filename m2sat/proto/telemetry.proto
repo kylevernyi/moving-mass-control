@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+message TelemetryMessage {
+    uint64 time = 1;
+    repeated double omega_b2i = 2 [packed = true]; // x y z omega
+    repeated double q_b2i = 3 [packed = true]; // pose quaternion
+    repeated double q_i2d = 4 [packed = true]; // desired quaternion
+    repeated double r_mass = 5  [packed = true]; //mass postion
+    repeated double rdot_mass = 6  [packed = true]; // mass velocity
+    repeated double r_mass_commanded = 7 [packed = true];  // commanded mass position
+    repeated double u_com = 8 [packed = true];  // commanded mass position
+    repeated double u_actual = 9 [packed = true];  // commanded mass position
+
+}
+
