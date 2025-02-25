@@ -192,6 +192,9 @@ class TelemetryMessage final :
     kRMassCommandedFieldNumber = 7,
     kUComFieldNumber = 8,
     kUActualFieldNumber = 9,
+    kNuTopFieldNumber = 10,
+    kNuBottomFieldNumber = 11,
+    kThetaHatFieldNumber = 12,
     kTimeFieldNumber = 1,
   };
   // repeated double omega_b2i = 2 [packed = true];
@@ -370,6 +373,72 @@ class TelemetryMessage final :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
       mutable_u_actual();
 
+  // repeated double nu_top = 10 [packed = true];
+  int nu_top_size() const;
+  private:
+  int _internal_nu_top_size() const;
+  public:
+  void clear_nu_top();
+  private:
+  double _internal_nu_top(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+      _internal_nu_top() const;
+  void _internal_add_nu_top(double value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+      _internal_mutable_nu_top();
+  public:
+  double nu_top(int index) const;
+  void set_nu_top(int index, double value);
+  void add_nu_top(double value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+      nu_top() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+      mutable_nu_top();
+
+  // repeated double nu_bottom = 11 [packed = true];
+  int nu_bottom_size() const;
+  private:
+  int _internal_nu_bottom_size() const;
+  public:
+  void clear_nu_bottom();
+  private:
+  double _internal_nu_bottom(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+      _internal_nu_bottom() const;
+  void _internal_add_nu_bottom(double value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+      _internal_mutable_nu_bottom();
+  public:
+  double nu_bottom(int index) const;
+  void set_nu_bottom(int index, double value);
+  void add_nu_bottom(double value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+      nu_bottom() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+      mutable_nu_bottom();
+
+  // repeated double theta_hat = 12 [packed = true];
+  int theta_hat_size() const;
+  private:
+  int _internal_theta_hat_size() const;
+  public:
+  void clear_theta_hat();
+  private:
+  double _internal_theta_hat(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+      _internal_theta_hat() const;
+  void _internal_add_theta_hat(double value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+      _internal_mutable_theta_hat();
+  public:
+  double theta_hat(int index) const;
+  void set_theta_hat(int index, double value);
+  void add_theta_hat(double value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+      theta_hat() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+      mutable_theta_hat();
+
   // uint64 time = 1;
   void clear_time();
   uint64_t time() const;
@@ -394,6 +463,9 @@ class TelemetryMessage final :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > r_mass_commanded_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > u_com_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > u_actual_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > nu_top_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > nu_bottom_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > theta_hat_;
   uint64_t time_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_telemetry_2eproto;
@@ -803,6 +875,147 @@ inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
 TelemetryMessage::mutable_u_actual() {
   // @@protoc_insertion_point(field_mutable_list:TelemetryMessage.u_actual)
   return _internal_mutable_u_actual();
+}
+
+// repeated double nu_top = 10 [packed = true];
+inline int TelemetryMessage::_internal_nu_top_size() const {
+  return nu_top_.size();
+}
+inline int TelemetryMessage::nu_top_size() const {
+  return _internal_nu_top_size();
+}
+inline void TelemetryMessage::clear_nu_top() {
+  nu_top_.Clear();
+}
+inline double TelemetryMessage::_internal_nu_top(int index) const {
+  return nu_top_.Get(index);
+}
+inline double TelemetryMessage::nu_top(int index) const {
+  // @@protoc_insertion_point(field_get:TelemetryMessage.nu_top)
+  return _internal_nu_top(index);
+}
+inline void TelemetryMessage::set_nu_top(int index, double value) {
+  nu_top_.Set(index, value);
+  // @@protoc_insertion_point(field_set:TelemetryMessage.nu_top)
+}
+inline void TelemetryMessage::_internal_add_nu_top(double value) {
+  nu_top_.Add(value);
+}
+inline void TelemetryMessage::add_nu_top(double value) {
+  _internal_add_nu_top(value);
+  // @@protoc_insertion_point(field_add:TelemetryMessage.nu_top)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+TelemetryMessage::_internal_nu_top() const {
+  return nu_top_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+TelemetryMessage::nu_top() const {
+  // @@protoc_insertion_point(field_list:TelemetryMessage.nu_top)
+  return _internal_nu_top();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+TelemetryMessage::_internal_mutable_nu_top() {
+  return &nu_top_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+TelemetryMessage::mutable_nu_top() {
+  // @@protoc_insertion_point(field_mutable_list:TelemetryMessage.nu_top)
+  return _internal_mutable_nu_top();
+}
+
+// repeated double nu_bottom = 11 [packed = true];
+inline int TelemetryMessage::_internal_nu_bottom_size() const {
+  return nu_bottom_.size();
+}
+inline int TelemetryMessage::nu_bottom_size() const {
+  return _internal_nu_bottom_size();
+}
+inline void TelemetryMessage::clear_nu_bottom() {
+  nu_bottom_.Clear();
+}
+inline double TelemetryMessage::_internal_nu_bottom(int index) const {
+  return nu_bottom_.Get(index);
+}
+inline double TelemetryMessage::nu_bottom(int index) const {
+  // @@protoc_insertion_point(field_get:TelemetryMessage.nu_bottom)
+  return _internal_nu_bottom(index);
+}
+inline void TelemetryMessage::set_nu_bottom(int index, double value) {
+  nu_bottom_.Set(index, value);
+  // @@protoc_insertion_point(field_set:TelemetryMessage.nu_bottom)
+}
+inline void TelemetryMessage::_internal_add_nu_bottom(double value) {
+  nu_bottom_.Add(value);
+}
+inline void TelemetryMessage::add_nu_bottom(double value) {
+  _internal_add_nu_bottom(value);
+  // @@protoc_insertion_point(field_add:TelemetryMessage.nu_bottom)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+TelemetryMessage::_internal_nu_bottom() const {
+  return nu_bottom_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+TelemetryMessage::nu_bottom() const {
+  // @@protoc_insertion_point(field_list:TelemetryMessage.nu_bottom)
+  return _internal_nu_bottom();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+TelemetryMessage::_internal_mutable_nu_bottom() {
+  return &nu_bottom_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+TelemetryMessage::mutable_nu_bottom() {
+  // @@protoc_insertion_point(field_mutable_list:TelemetryMessage.nu_bottom)
+  return _internal_mutable_nu_bottom();
+}
+
+// repeated double theta_hat = 12 [packed = true];
+inline int TelemetryMessage::_internal_theta_hat_size() const {
+  return theta_hat_.size();
+}
+inline int TelemetryMessage::theta_hat_size() const {
+  return _internal_theta_hat_size();
+}
+inline void TelemetryMessage::clear_theta_hat() {
+  theta_hat_.Clear();
+}
+inline double TelemetryMessage::_internal_theta_hat(int index) const {
+  return theta_hat_.Get(index);
+}
+inline double TelemetryMessage::theta_hat(int index) const {
+  // @@protoc_insertion_point(field_get:TelemetryMessage.theta_hat)
+  return _internal_theta_hat(index);
+}
+inline void TelemetryMessage::set_theta_hat(int index, double value) {
+  theta_hat_.Set(index, value);
+  // @@protoc_insertion_point(field_set:TelemetryMessage.theta_hat)
+}
+inline void TelemetryMessage::_internal_add_theta_hat(double value) {
+  theta_hat_.Add(value);
+}
+inline void TelemetryMessage::add_theta_hat(double value) {
+  _internal_add_theta_hat(value);
+  // @@protoc_insertion_point(field_add:TelemetryMessage.theta_hat)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+TelemetryMessage::_internal_theta_hat() const {
+  return theta_hat_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+TelemetryMessage::theta_hat() const {
+  // @@protoc_insertion_point(field_list:TelemetryMessage.theta_hat)
+  return _internal_theta_hat();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+TelemetryMessage::_internal_mutable_theta_hat() {
+  return &theta_hat_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+TelemetryMessage::mutable_theta_hat() {
+  // @@protoc_insertion_point(field_mutable_list:TelemetryMessage.theta_hat)
+  return _internal_mutable_theta_hat();
 }
 
 #ifdef __GNUC__

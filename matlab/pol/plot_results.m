@@ -200,9 +200,9 @@ sgtitle("Omega Estimation");
 figure; hold on;
 for k = 1:3
     subplot(3,1,k)
-    plot(T(2:end), omega_dot(k,:), 'k-'); hold on;
-    plot(T(1:end), omega_dot_hat(k,:), '--r'); hold on;
-    plot(T(1:end), omega_dot_hat_smooth(k,:), '--g'); 
+    plot(T(2:1000), omega_dot(k,2:1000), 'k-'); hold on;
+    plot(T(1:1000), omega_dot_hat(k,1:1000), '-r'); hold on;
+    plot(T(1:1000), omega_dot_hat_smooth(k,1:1000), '-g'); 
     legend(["True" "Kalman" "Smoothed"]) % "True" 
 end
 sgtitle("Omega Dot Estimation")

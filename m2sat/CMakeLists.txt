@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 # Set project name
 project(m2sat)
+set(CMAKE_BUILD_TYPE RELEASE)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)

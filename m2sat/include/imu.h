@@ -58,9 +58,9 @@ struct imu_data_vn_format_t
         // tele->imu.accel.z() = -acceleration.z; 
 
         // body angular velocity
-        tele->omega_b2i.x() = angularRate.x; 
-        tele->omega_b2i.y() = angularRate.y; 
-        tele->omega_b2i.z() = angularRate.z;    
+        tele->omega_b2i_B.x() = angularRate.x; 
+        tele->omega_b2i_B.y() = angularRate.y; 
+        tele->omega_b2i_B.z() = angularRate.z;    
     }
 
     

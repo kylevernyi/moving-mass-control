@@ -72,7 +72,7 @@ uint8_t * buffer, uint8_t length)
     struct i2c_rdwr_ioctl_data ioctl_data = { messages, 2 };
     int result = ioctl(fd, I2C_RDWR, &ioctl_data);
     if (result != 2) {
-    perror("failed to get variables");
+    // perror("failed to get variables");
     return -1;
     }
 
@@ -91,6 +91,19 @@ int tic_get_current_position(int fd, uint8_t address, int32_t * output)
     ((uint32_t)buffer[2] << 16) + ((uint32_t)buffer[3] << 24);
     return 0;
 }
+
+// todo
+int tic_get_current_velocity(int fd, uint8_t address, int32_t * output)
+{
+    *output = 0;
+    uint8_t buffer[4];
+    // int result = tic_get_variable(fd, address, 0x22, buffer, sizeof(buffer));
+    // if (result) { return -1; }
+    // *output = buffer[0] + ((uint32_t)buffer[1] << 8) +
+    // ((uint32_t)buffer[2] << 16) + ((uint32_t)buffer[3] << 24);
+    return 0;
+}
+
 
 // int main()
 // {

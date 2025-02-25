@@ -14,8 +14,8 @@ dt = 0.01;
 t = 0:dt:tf;
 
 % Noise params
-R = 0.001;
-Q = 0.01*eye(2);
+R = 0.0001;
+Q = 1*eye(2);
 
 % System matrices
 F = expm([0 1; 0 0]*dt); % state transition matrix

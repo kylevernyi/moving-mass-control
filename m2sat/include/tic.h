@@ -20,6 +20,7 @@ extern "C"
     int tic_set_target_position(int fd, uint8_t address, int32_t target);
     int tic_get_variable(int fd, uint8_t address, uint8_t offset, uint8_t * buffer, uint8_t length);
     int tic_get_current_position(int fd, uint8_t address, int32_t * output);
+    int tic_get_current_velocity(int fd, uint8_t address, int32_t * output);
 }
 
 

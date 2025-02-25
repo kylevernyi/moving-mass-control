@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15proto/telemetry.proto\"\xcf\x01\n\x10TelemetryMessage\x12\x0c\n\x04time\x18\x01 \x01(\x04\x12\x15\n\tomega_b2i\x18\x02 \x03(\x01\x42\x02\x10\x01\x12\x11\n\x05q_b2i\x18\x03 \x03(\x01\x42\x02\x10\x01\x12\x11\n\x05q_i2d\x18\x04 \x03(\x01\x42\x02\x10\x01\x12\x12\n\x06r_mass\x18\x05 \x03(\x01\x42\x02\x10\x01\x12\x15\n\trdot_mass\x18\x06 \x03(\x01\x42\x02\x10\x01\x12\x1c\n\x10r_mass_commanded\x18\x07 \x03(\x01\x42\x02\x10\x01\x12\x11\n\x05u_com\x18\x08 \x03(\x01\x42\x02\x10\x01\x12\x14\n\x08u_actual\x18\t \x03(\x01\x42\x02\x10\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15proto/telemetry.proto\"\x91\x02\n\x10TelemetryMessage\x12\x0c\n\x04time\x18\x01 \x01(\x04\x12\x15\n\tomega_b2i\x18\x02 \x03(\x01\x42\x02\x10\x01\x12\x11\n\x05q_b2i\x18\x03 \x03(\x01\x42\x02\x10\x01\x12\x11\n\x05q_i2d\x18\x04 \x03(\x01\x42\x02\x10\x01\x12\x12\n\x06r_mass\x18\x05 \x03(\x01\x42\x02\x10\x01\x12\x15\n\trdot_mass\x18\x06 \x03(\x01\x42\x02\x10\x01\x12\x1c\n\x10r_mass_commanded\x18\x07 \x03(\x01\x42\x02\x10\x01\x12\x11\n\x05u_com\x18\x08 \x03(\x01\x42\x02\x10\x01\x12\x14\n\x08u_actual\x18\t \x03(\x01\x42\x02\x10\x01\x12\x12\n\x06nu_top\x18\n \x03(\x01\x42\x02\x10\x01\x12\x15\n\tnu_bottom\x18\x0b \x03(\x01\x42\x02\x10\x01\x12\x15\n\ttheta_hat\x18\x0c \x03(\x01\x42\x02\x10\x01\x62\x06proto3')
 
 
 
@@ -45,6 +45,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _TELEMETRYMESSAGE.fields_by_name['u_com']._serialized_options = b'\020\001'
   _TELEMETRYMESSAGE.fields_by_name['u_actual']._options = None
   _TELEMETRYMESSAGE.fields_by_name['u_actual']._serialized_options = b'\020\001'
+  _TELEMETRYMESSAGE.fields_by_name['nu_top']._options = None
+  _TELEMETRYMESSAGE.fields_by_name['nu_top']._serialized_options = b'\020\001'
+  _TELEMETRYMESSAGE.fields_by_name['nu_bottom']._options = None
+  _TELEMETRYMESSAGE.fields_by_name['nu_bottom']._serialized_options = b'\020\001'
+  _TELEMETRYMESSAGE.fields_by_name['theta_hat']._options = None
+  _TELEMETRYMESSAGE.fields_by_name['theta_hat']._serialized_options = b'\020\001'
   _TELEMETRYMESSAGE._serialized_start=26
-  _TELEMETRYMESSAGE._serialized_end=233
+  _TELEMETRYMESSAGE._serialized_end=299
 # @@protoc_insertion_point(module_scope)

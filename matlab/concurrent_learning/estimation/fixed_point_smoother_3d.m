@@ -16,7 +16,7 @@ t = 0:dt:tf;
 % Noise params
 R = 0.0001*eye(3);
 Q = [0.000001*eye(3), zeros(3,3); 
-    zeros(3,3),  0.00000001*eye(3)];
+    zeros(3,3),  0.01*eye(3)];
 
 % System matrices
 A = [zeros(3,3), eye(3); zeros(3,6)];
@@ -91,8 +91,8 @@ for i = 1:length(t)-1
 
     % Dynamics
     e(:,i) = x(:,i) - zeros(6,1);
-    u(:,i) = -K*x(:,i);
-    x(:,i+1) = F*x(:, i)+ G*u(:,i)  + sqrtm(Q)*randn(6,1); % true state  % 
+    u(:,i) = -K*x(:,i) + [sin(.2*t(i)); cos(.2*t(i)); sin(.6*t(i))] ;
+    x(:,i+1) = F*x(:, i)+ G*u(:,i)  + sqrtm(Q)*randn(6,1)*0; % true state  % 
    
 end
 % at this point, xhat has been smoothed while xhat_original has not
@@ -119,19 +119,19 @@ sgtitle("State Error");
 figure; 
 for q = 1:3
     subplot(3,1,q);
-    plot(t, x(q,:), t, xhat_original(q,:), t, xhat(q,:) )
-    legend(["True" "Kalman" "Smoothed"]);
+    plot( t, xhat(q,:), t, xhat_original(q,:), t, x(q,:))
+    legend([ "Smoothed" "Kalman" "True"]);
 end
-ylabel("Position");  xlabel("Time (sec)");
+xlabel("Time (sec)");
 sgtitle("Position Estimation");
 
 figure; 
 for q = 4:6
     subplot(3,1,q-3);
-    plot(t, x(q,:), t, xhat(q,:), t, xhat_original(q,:))
-    legend(["True" "Smoothed" "Kalman"]);
+    plot( t, xhat_original(q,:),  t, xhat(q,:), t, x(q,:))
+    legend(["Kalman" "Smoothed" "True" ]);
 end
-ylabel("Velocity");  xlabel("Time (sec)");
+xlabel("Time (sec)");
 sgtitle("Velocity Estimation");
 
 
@@ -141,51 +141,51 @@ P2 = squeeze(P(2,2,:));
 Pi1 = squeeze(Pi(1,1,:));
 Pi2 = squeeze(Pi(2,2,:));
 
-figure;
-plot(t, P1, t, P2, t, Pi1, "--", t, Pi2, "--");
-title("Covariance vs Time"); xlabel("Time (sec)");
-ylabel("Covariance"); 
-legend(["P1" "P2" "Pi1" "Pi2"])
+% figure;
+% plot(t, P1, t, P2, t, Pi1, "--", t, Pi2, "--");
+% title("Covariance vs Time"); xlabel("Time (sec)");
+% ylabel("Covariance"); 
+% legend(["P1" "P2" "Pi1" "Pi2"])
+% 
+% figure; 
+% plot(t, [e_meas [0;0;0]], t, e_kalman(1,:), t, e_smoothed(1,:) );
+% title("Estimation Error Signals")
+% legend(["Meas" "Estimated" "Smoothed"]);
 
-figure; 
-plot(t, [e_meas [0;0;0]], t, e_kalman(1,:), t, e_smoothed(1,:) );
-title("Estimation Error Signals")
-legend(["Meas" "Estimated" "Smoothed"]);
+% 
+% figure; 
+% for q = 1:6 
+%     if q <= 3
+%         plot(t(2:end), squeeze(L(q,q,:)))
+%     else 
+%         plot(t(2:end), squeeze(L(q,q-3,:)))
+%     end
+% end
+% title("Kalman Gains over Time"); xlabel("Time (sec)")
+% legend(["k1" "k2" "k3" "k4" "k5" "k6"])
+% 
+% figure; hold on;
+% for q = 1:6 
+%     if q <= 3
+%         plot(t(2:end), squeeze(lambda(q,q,:)))
+%     else 
+%         plot(t(2:end), squeeze(lambda(q,q-3,:)))
+%     end
+% end
+% title("Smoother Gains"); ylabel("\lambda"); xlabel("Time (sec)"); 
+% legend(["\lambda_1" "\lambda_2" "\lambda_3" "\lambda_4" "\lambda_5" "\lambda_6"])
 
-
-figure; 
-for q = 1:6 
-    if q <= 3
-        plot(t(2:end), squeeze(L(q,q,:)))
-    else 
-        plot(t(2:end), squeeze(L(q,q-3,:)))
-    end
-end
-title("Kalman Gains over Time"); xlabel("Time (sec)")
-legend(["k1" "k2" "k3" "k4" "k5" "k6"])
-
-figure; hold on;
-for q = 1:6 
-    if q <= 3
-        plot(t(2:end), squeeze(lambda(q,q,:)))
-    else 
-        plot(t(2:end), squeeze(lambda(q,q-3,:)))
-    end
-end
-title("Smoother Gains"); ylabel("\lambda"); xlabel("Time (sec)"); 
-legend(["\lambda_1" "\lambda_2" "\lambda_3" "\lambda_4" "\lambda_5" "\lambda_6"])
-
-
-trP = [];
-trPi = [];
-for q = 1:length(t)
-    trP(q) = trace(P(:,:,q));
-    trPi(q) = trace(Pi(:,:,q));
-end
-figure; hold on;
-plot(t, trP, t, trPi);
-title("Tr(Cov)"); ylabel("Tr(cov)"); xlabel("Time (sec)");
-legend(["P" "Pi"])
+% 
+% trP = [];
+% trPi = [];
+% for q = 1:length(t)
+%     trP(q) = trace(P(:,:,q));
+%     trPi(q) = trace(Pi(:,:,q));
+% end
+% figure; hold on;
+% plot(t, trP, t, trPi);
+% title("Tr(Cov)"); ylabel("Tr(cov)"); xlabel("Time (sec)");
+% legend(["P" "Pi"])
 
 
 fprintf("Position Error Norm:\n");

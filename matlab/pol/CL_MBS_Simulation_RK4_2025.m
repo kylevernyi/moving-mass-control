@@ -47,9 +47,9 @@ A = pi/3; % Desired Oscillation Amplitude
 
 % Concurrent learning gains
 CL_on = 1; 
-CL_point_accept_epsilon = 1; % Threshold to accept new points
-p_bar = 50; % maximum number of points stored
-CL_gain = .1*inv(gamma)/p_bar; 
+CL_point_accept_epsilon = 0.01; % Threshold to accept new points
+p_bar = 10; % maximum number of points stored
+CL_gain = .01*inv(gamma)/p_bar; 
 
 % Fixed point smoothing parameters
 H = [eye(3), zeros(3,3)];
@@ -173,7 +173,7 @@ persistent u_com_local r_com_local; % zero order hold
 persistent w_iter ; % whole step iterations 
 %% Concurrent learning variables 
 global point_added min_sv;
-persistent Tau_ext_stack Phi_stack;
+persistent Tau_ext_stack Phi_stack Theta_hat_stack;
 persistent Phi_last_point_stored p;
 persistent current_index_for_cyclic_stack rk4_counter xdot_hat_available;
 % Particle filter variables
@@ -184,8 +184,8 @@ persistent current_index_for_cyclic_stack rk4_counter xdot_hat_available;
 global xhat xhat_original L lambda P_smoother Sigma Pi omega_b2i_B_meas kf_iter;
 persistent j_smooth ;
 
-Q = [0.000001*eye(3), zeros(3,3);
-    zeros(3,3), 0.0000001*eye(3)]; % Process noise covariance
+Q = [0.001*eye(3), zeros(3,3);
+    zeros(3,3), 10*eye(3)]; % Process noise covariance
 R = sigma_omega^2*eye(3); % Measurement noise covariance
 
 global omega_dot; % for derivative testing
@@ -218,16 +218,12 @@ if isempty(xhat)
     % xhat = [omega; omega_dot];
     xhat = [omega_b2i_B; zeros(3,1)]; % initialize kalman filter to state
     P_smoother = [1*eye(3), zeros(3,3); 
-                  zeros(3,3),  0.01*eye(3)]; % initial covariance matrix;
+                  zeros(3,3),  1e6*eye(3)]; % initial covariance matrix;
     kf_iter = 1;
     j_smooth = 10;
     xdot_hat_available = false;
 end
-%% Initialize particle filter
-% if isempty(particles)
-%     particles = omega_b2i_B + 0.01 * randn(3, N); % Small spread around the true state since we have a good initial estimate 
-%     omega_b2i_B_est = mean(particles, 2);
-% end
+
 
 
 %% Make measurements on state variables
@@ -332,7 +328,7 @@ g_b_x = skew(g_B); % Skew Matrix of Gravity Vector in BFF
 Phi = -M*g_b_x; % Phi definition as in ref[DOI: 10.2514/1.60380]
 
 %% Control Torque as Designed by Lyapunov Analysis ONLY ON WHOLE TIME STEPS
-P = (eye(3)-(g_B*g_B')/(norm(g_B)^2));
+P = (eye(3)-(g_B*g_B') / (norm(g_B)^2));
 if (whole_timestep && integration_phase)
     % Without kalman filter use noisy measurements only
     % u_com(:,kf_iter) = P*cross(omega_b2i_B_noise,J*omega_b2i_B_noise) - P*Phi*theta_hat...
@@ -351,43 +347,6 @@ if (whole_timestep && integration_phase)
     r_com(:,w_iter) = m\(cross(g_B, u_com_local)/(norm(g_B)^2)); % commanded mass positions
     r_com_local = r_com(:,w_iter); % commanded mass positions
 end
-
-
-% %% Particle filter from measurements
-% if (whole_timestep && integration_phase)
-%     % Predict step: Propagate particles using nonlinear dynamics
-%     for i = 1:N
-%         omega_dot_p = J \ (-cross(particles(:,i), J * particles(:,i)) + Phi*theta_hat +  u_com); 
-%         particles(:,i) = particles(:,i) + omega_dot_p + sqrtm(Q) * randn(3,1);
-%         % Measurement update (nudging towards observation)
-%         particles(:,i) = particles(:,i) + 0.5 * (omega_b2i_B_meas - particles(:,i));
-%     end
-% 
-%     % Compute weights based on measurement likelihood
-%     log_weights = -0.5 * sum(((omega_b2i_B_meas - particles).^2) ./ diag(R), 1);
-%     log_weights = log_weights - max(log_weights);  % Normalize before exponentiation
-%     weights = exp(log_weights);
-%     weights = weights / sum(weights);
-% 
-%     % weights = exp(-0.5 * sum(( (omega_b2i_B_noisy - particles).^2) ./ diag(R), 1));
-%     % weights = weights / sum(weights);  % Normalize
-% 
-%     % Resample using systematic resampling
-%     indices = randsample(1:N, N, true, weights);
-%     particles = particles(:, indices);
-% 
-%     ess = 1 / sum(weights.^2);
-%     ESS = [ESS ess]; % Compute effective sample size
-% 
-%     if ess < N / 2
-%         indices = randsample(1:N, N, true, weights);
-%         particles = particles(:, indices);
-%     end
-% 
-%     % Estimate state as mean of particles
-%     omega_b2i_B_est = [omega_b2i_B_est, mean(particles, 2)];
-% end
-% process_noise = sqrtm(Q)*randn(3,1)*omega_noise_on;
 
 %% Concurrent learning data selection algorithm
 % Initialize concurrent learning persistent variables 
@@ -416,10 +375,12 @@ if (CL_on && whole_timestep && integration_phase)  % only do this if integrating
                 current_index_for_cyclic_stack = p;
                 Tau_ext_stack(:, p) = Tau_ext_j;
                 Phi_stack(:, p) = Phi(:);
+                Theta_hat_stack(:,p) = theta_hat;
                 Phi_last_point_stored = Phi(:);
             else
                 % Cyclic history stack
                 [Phi_stack, ~] = updateHistoryStack(Phi_stack, current_index_for_cyclic_stack, Phi(:), p_bar);
+                [Theta_hat_stack,~] = updateHistoryStack(Theta_hat_stack, current_index_for_cyclic_stack, theta_hat, p_bar);
                 [Tau_ext_stack, current_index_for_cyclic_stack] = updateHistoryStack(Tau_ext_stack, current_index_for_cyclic_stack, Phi*theta, p_bar);
             end 
     
@@ -433,8 +394,10 @@ epsilon_Tau_ext = zeros(3,p);
 for j = 1:p
     Tau_ext_j = Tau_ext_stack(:,j); % jth delta from storage
     Phi_j = reshape(Phi_stack(:, j), 3, 3); % jth phi matrix from storage
+    theta_hat_j = Theta_hat_stack(:,j);
 
-    epsilon_Tau_ext(:,j) = Phi_j*theta_hat - Tau_ext_j; % units of meters actually
+    % epsilon_Tau_ext(:,j) = Phi_j*theta_hat - Tau_ext_j; % units of meters actually
+    epsilon_Tau_ext(:,j) = Phi_j*theta_hat_j - Tau_ext_j;
 
     concurrent_learning_Tau_ext = concurrent_learning_Tau_ext + Phi_j*epsilon_Tau_ext(:,j);  
 end

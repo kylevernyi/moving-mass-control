@@ -10,6 +10,8 @@ message TelemetryMessage {
     repeated double r_mass_commanded = 7 [packed = true];  // commanded mass position
     repeated double u_com = 8 [packed = true];  // commanded mass position
     repeated double u_actual = 9 [packed = true];  // commanded mass position
-
+    repeated double nu_top = 10 [packed = true]; // kalman filter estimate 3x1
+    repeated double nu_bottom = 11 [packed = true]; // kalman filter estimate 3x1
+    repeated double theta_hat = 12 [packed = true]; // mass offset estimate
 }
 

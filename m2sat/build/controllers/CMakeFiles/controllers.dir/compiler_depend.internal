@@ -3,6 +3,7 @@
 
 controllers/CMakeFiles/controllers.dir/src/controller.cpp.o
  /home/kyle/school/s25/mmc/m2sat/controllers/src/controller.cpp
+ /home/kyle/school/s25/mmc/m2sat/include/telemetry.h
  /home/kyle/school/s25/mmc/m2sat/controllers/include/controller.h
  /home/kyle/school/s25/mmc/m2sat/controllers/include/kalman.h
  /usr/include/alloca.h
@@ -42,7 +43,9 @@ controllers/CMakeFiles/controllers.dir/src/controller.cpp.o
  /usr/include/bits/stdint-intn.h
  /usr/include/bits/stdint-least.h
  /usr/include/bits/stdint-uintn.h
+ /usr/include/bits/stdio.h
  /usr/include/bits/stdio_lim.h
+ /usr/include/bits/stdlib-bsearch.h
  /usr/include/bits/stdlib-float.h
  /usr/include/bits/struct_mutex.h
  /usr/include/bits/struct_rwlock.h
@@ -101,6 +104,7 @@ controllers/CMakeFiles/controllers.dir/src/controller.cpp.o
  /usr/include/c++/14/bits/basic_string.tcc
  /usr/include/c++/14/bits/char_traits.h
  /usr/include/c++/14/bits/charconv.h
+ /usr/include/c++/14/bits/chrono.h
  /usr/include/c++/14/bits/concept_check.h
  /usr/include/c++/14/bits/cpp_type_traits.h
  /usr/include/c++/14/bits/cxxabi_forced.h
@@ -131,6 +135,7 @@ controllers/CMakeFiles/controllers.dir/src/controller.cpp.o
  /usr/include/c++/14/bits/node_handle.h
  /usr/include/c++/14/bits/ostream.tcc
  /usr/include/c++/14/bits/ostream_insert.h
+ /usr/include/c++/14/bits/parse_numbers.h
  /usr/include/c++/14/bits/postypes.h
  /usr/include/c++/14/bits/predefined_ops.h
  /usr/include/c++/14/bits/ptr_traits.h
@@ -168,6 +173,7 @@ controllers/CMakeFiles/controllers.dir/src/controller.cpp.o
  /usr/include/c++/14/cassert
  /usr/include/c++/14/cctype
  /usr/include/c++/14/cerrno
+ /usr/include/c++/14/chrono
  /usr/include/c++/14/climits
  /usr/include/c++/14/clocale
  /usr/include/c++/14/cmath
@@ -179,6 +185,7 @@ controllers/CMakeFiles/controllers.dir/src/controller.cpp.o
  /usr/include/c++/14/cstdio
  /usr/include/c++/14/cstdlib
  /usr/include/c++/14/cstring
+ /usr/include/c++/14/ctime
  /usr/include/c++/14/cwchar
  /usr/include/c++/14/cwctype
  /usr/include/c++/14/debug/assertions.h
@@ -194,6 +201,7 @@ controllers/CMakeFiles/controllers.dir/src/controller.cpp.o
  /usr/include/c++/14/initializer_list
  /usr/include/c++/14/ios
  /usr/include/c++/14/iosfwd
+ /usr/include/c++/14/iostream
  /usr/include/c++/14/istream
  /usr/include/c++/14/limits
  /usr/include/c++/14/new
@@ -201,6 +209,7 @@ controllers/CMakeFiles/controllers.dir/src/controller.cpp.o
  /usr/include/c++/14/pstl/execution_defs.h
  /usr/include/c++/14/pstl/glue_algorithm_defs.h
  /usr/include/c++/14/pstl/pstl_config.h
+ /usr/include/c++/14/ratio
  /usr/include/c++/14/sstream
  /usr/include/c++/14/stdexcept
  /usr/include/c++/14/stdlib.h
@@ -496,7 +505,9 @@ controllers/CMakeFiles/controllers.dir/src/kalman.cpp.o
  /usr/include/bits/stdint-intn.h
  /usr/include/bits/stdint-least.h
  /usr/include/bits/stdint-uintn.h
+ /usr/include/bits/stdio.h
  /usr/include/bits/stdio_lim.h
+ /usr/include/bits/stdlib-bsearch.h
  /usr/include/bits/stdlib-float.h
  /usr/include/bits/struct_mutex.h
  /usr/include/bits/struct_rwlock.h

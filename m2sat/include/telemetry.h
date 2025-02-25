@@ -2,21 +2,46 @@
 
 #include <Eigen/Dense>
 #include <chrono>
+#include <iostream> 
 
-#define TELEMETRY_SEND_RATE_HZ (10) 
+#define TELEMETRY_SEND_RATE_HZ (20) 
 using namespace Eigen;
 typedef Vector<double, 6> Vector6d;
 
 struct telemetry_t 
 {
     uint64_t time = 0;
-    Quaterniond q_b2i = Quaterniond::Identity();
+    Quaterniond q_b2i = Quaterniond::Identity(); // q from body to inertial (from IMU)
     Quaterniond q_i2d = Quaterniond::Identity();
-    Vector3d omega_b2i= Vector3d::Zero();
-    Vector3d r_mass; //mass postion
-    Vector3d rdot_mass; // mass velocity
-    Vector3d r_mass_commanded; // commanded mass position
-    Vector3d u_com; // commanded torque
-    Vector3d u_actual; // actual control torque
-    Vector6d nu; // kalman filter estimate
+    Vector3d omega_b2i_B = Vector3d::Zero(); // angular velocity of b2i in body frame (from IMU)
+    Vector3d r_mass = Vector3d::Zero(); //mass postion
+    Vector3d rdot_mass = Vector3d::Zero(); // mass velocity
+    Vector3d r_mass_commanded = Vector3d::Zero(); // commanded mass position
+    Vector3d u_com = Vector3d::Zero(); // commanded torque
+    Vector3d u_actual = Vector3d::Zero(); // actual control torque
+    std::vector<Vector6d> nu; // kalman filter estimate
+    Vector3d theta_hat = Vector3d::Zero();
+
+    Quaterniond get_q_i2b()
+    {
+        return q_b2i.conjugate();
+    }
+
+    void Disp() {
+    std::cout << "Time: " << time << " ms" << std::endl;
+    std::cout << "q_b2i (Quaternion from body to inertial): "
+              << q_b2i.coeffs().transpose() << std::endl;
+    std::cout << "q_i2d (Quaternion from inertial to desired): "
+              << q_i2d.coeffs().transpose() << std::endl;
+    std::cout << "omega_b2i_B (Angular velocity of b2i in body frame): "
+              << omega_b2i_B.transpose() << std::endl;
+    std::cout << "r_mass (Mass position): " << r_mass.transpose() << std::endl;
+    std::cout << "rdot_mass (Mass velocity): " << rdot_mass.transpose() << std::endl;
+    std::cout << "r_mass_commanded (Commanded mass position): "
+              << r_mass_commanded.transpose() << std::endl;
+    std::cout << "u_com (Commanded torque): " << u_com.transpose() << std::endl;
+    std::cout << "u_actual (Actual control torque): " << u_actual.transpose() << std::endl;
+    std::cout << "theta_hat (Estimated offset): " << theta_hat.transpose() << std::endl;
+    std::cout << "+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n";
+}
 };

@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/kyle/school/s25/mmc/m2sat/controllers/include -isystem /usr/include/eigen3
+CXX_INCLUDES = -I/home/kyle/school/s25/mmc/m2sat/controllers/include -I/home/kyle/school/s25/mmc/m2sat/controllers/../include -isystem /usr/include/eigen3
 
-CXX_FLAGS = -std=gnu++17
+CXX_FLAGS = -O3 -DNDEBUG -std=gnu++17
 

@@ -26,6 +26,9 @@ constexpr TelemetryMessage::TelemetryMessage(
   , r_mass_commanded_()
   , u_com_()
   , u_actual_()
+  , nu_top_()
+  , nu_bottom_()
+  , theta_hat_()
   , time_(uint64_t{0u}){}
 struct TelemetryMessageDefaultTypeInternal {
   constexpr TelemetryMessageDefaultTypeInternal()
@@ -56,6 +59,9 @@ const uint32_t TableStruct_telemetry_2eproto::offsets[] PROTOBUF_SECTION_VARIABL
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, r_mass_commanded_),
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, u_com_),
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, u_actual_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, nu_top_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, nu_bottom_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, theta_hat_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::TelemetryMessage)},
@@ -66,16 +72,18 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_telemetry_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\017telemetry.proto\"\317\001\n\020TelemetryMessage\022\014"
+  "\n\017telemetry.proto\"\221\002\n\020TelemetryMessage\022\014"
   "\n\004time\030\001 \001(\004\022\025\n\tomega_b2i\030\002 \003(\001B\002\020\001\022\021\n\005q"
   "_b2i\030\003 \003(\001B\002\020\001\022\021\n\005q_i2d\030\004 \003(\001B\002\020\001\022\022\n\006r_m"
   "ass\030\005 \003(\001B\002\020\001\022\025\n\trdot_mass\030\006 \003(\001B\002\020\001\022\034\n\020"
   "r_mass_commanded\030\007 \003(\001B\002\020\001\022\021\n\005u_com\030\010 \003("
-  "\001B\002\020\001\022\024\n\010u_actual\030\t \003(\001B\002\020\001b\006proto3"
+  "\001B\002\020\001\022\024\n\010u_actual\030\t \003(\001B\002\020\001\022\022\n\006nu_top\030\n "
+  "\003(\001B\002\020\001\022\025\n\tnu_bottom\030\013 \003(\001B\002\020\001\022\025\n\ttheta_"
+  "hat\030\014 \003(\001B\002\020\001b\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_telemetry_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_telemetry_2eproto = {
-  false, false, 235, descriptor_table_protodef_telemetry_2eproto, "telemetry.proto", 
+  false, false, 301, descriptor_table_protodef_telemetry_2eproto, "telemetry.proto", 
   &descriptor_table_telemetry_2eproto_once, nullptr, 0, 1,
   schemas, file_default_instances, TableStruct_telemetry_2eproto::offsets,
   file_level_metadata_telemetry_2eproto, file_level_enum_descriptors_telemetry_2eproto, file_level_service_descriptors_telemetry_2eproto,
@@ -103,7 +111,10 @@ TelemetryMessage::TelemetryMessage(::PROTOBUF_NAMESPACE_ID::Arena* arena,
   rdot_mass_(arena),
   r_mass_commanded_(arena),
   u_com_(arena),
-  u_actual_(arena) {
+  u_actual_(arena),
+  nu_top_(arena),
+  nu_bottom_(arena),
+  theta_hat_(arena) {
   SharedCtor();
   if (!is_message_owned) {
     RegisterArenaDtor(arena);
@@ -119,7 +130,10 @@ TelemetryMessage::TelemetryMessage(const TelemetryMessage& from)
       rdot_mass_(from.rdot_mass_),
       r_mass_commanded_(from.r_mass_commanded_),
       u_com_(from.u_com_),
-      u_actual_(from.u_actual_) {
+      u_actual_(from.u_actual_),
+      nu_top_(from.nu_top_),
+      nu_bottom_(from.nu_bottom_),
+      theta_hat_(from.theta_hat_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   time_ = from.time_;
   // @@protoc_insertion_point(copy_constructor:TelemetryMessage)
@@ -164,6 +178,9 @@ void TelemetryMessage::Clear() {
   r_mass_commanded_.Clear();
   u_com_.Clear();
   u_actual_.Clear();
+  nu_top_.Clear();
+  nu_bottom_.Clear();
+  theta_hat_.Clear();
   time_ = uint64_t{0u};
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
@@ -270,6 +287,39 @@ const char* TelemetryMessage::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPA
         } else
           goto handle_unusual;
         continue;
+      // repeated double nu_top = 10 [packed = true];
+      case 10:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 82)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedDoubleParser(_internal_mutable_nu_top(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<uint8_t>(tag) == 81) {
+          _internal_add_nu_top(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr));
+          ptr += sizeof(double);
+        } else
+          goto handle_unusual;
+        continue;
+      // repeated double nu_bottom = 11 [packed = true];
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 90)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedDoubleParser(_internal_mutable_nu_bottom(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<uint8_t>(tag) == 89) {
+          _internal_add_nu_bottom(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr));
+          ptr += sizeof(double);
+        } else
+          goto handle_unusual;
+        continue;
+      // repeated double theta_hat = 12 [packed = true];
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 98)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedDoubleParser(_internal_mutable_theta_hat(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<uint8_t>(tag) == 97) {
+          _internal_add_theta_hat(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr));
+          ptr += sizeof(double);
+        } else
+          goto handle_unusual;
+        continue;
       default:
         goto handle_unusual;
     }  // switch
@@ -343,6 +393,21 @@ uint8_t* TelemetryMessage::_InternalSerialize(
   // repeated double u_actual = 9 [packed = true];
   if (this->_internal_u_actual_size() > 0) {
     target = stream->WriteFixedPacked(9, _internal_u_actual(), target);
+  }
+
+  // repeated double nu_top = 10 [packed = true];
+  if (this->_internal_nu_top_size() > 0) {
+    target = stream->WriteFixedPacked(10, _internal_nu_top(), target);
+  }
+
+  // repeated double nu_bottom = 11 [packed = true];
+  if (this->_internal_nu_bottom_size() > 0) {
+    target = stream->WriteFixedPacked(11, _internal_nu_bottom(), target);
+  }
+
+  // repeated double theta_hat = 12 [packed = true];
+  if (this->_internal_theta_hat_size() > 0) {
+    target = stream->WriteFixedPacked(12, _internal_theta_hat(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -457,6 +522,42 @@ size_t TelemetryMessage::ByteSizeLong() const {
     total_size += data_size;
   }
 
+  // repeated double nu_top = 10 [packed = true];
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_nu_top_size());
+    size_t data_size = 8UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
+    }
+    total_size += data_size;
+  }
+
+  // repeated double nu_bottom = 11 [packed = true];
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_nu_bottom_size());
+    size_t data_size = 8UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
+    }
+    total_size += data_size;
+  }
+
+  // repeated double theta_hat = 12 [packed = true];
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_theta_hat_size());
+    size_t data_size = 8UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
+    }
+    total_size += data_size;
+  }
+
   // uint64 time = 1;
   if (this->_internal_time() != 0) {
     total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64SizePlusOne(this->_internal_time());
@@ -492,6 +593,9 @@ void TelemetryMessage::MergeFrom(const TelemetryMessage& from) {
   r_mass_commanded_.MergeFrom(from.r_mass_commanded_);
   u_com_.MergeFrom(from.u_com_);
   u_actual_.MergeFrom(from.u_actual_);
+  nu_top_.MergeFrom(from.nu_top_);
+  nu_bottom_.MergeFrom(from.nu_bottom_);
+  theta_hat_.MergeFrom(from.theta_hat_);
   if (from._internal_time() != 0) {
     _internal_set_time(from._internal_time());
   }
@@ -520,6 +624,9 @@ void TelemetryMessage::InternalSwap(TelemetryMessage* other) {
   r_mass_commanded_.InternalSwap(&other->r_mass_commanded_);
   u_com_.InternalSwap(&other->u_com_);
   u_actual_.InternalSwap(&other->u_actual_);
+  nu_top_.InternalSwap(&other->nu_top_);
+  nu_bottom_.InternalSwap(&other->nu_bottom_);
+  theta_hat_.InternalSwap(&other->theta_hat_);
   swap(time_, other->time_);
 }
 

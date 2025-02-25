@@ -1,3 +1,5 @@
+m2sat/build/*
+
 # Prerequisites
 *.d
 

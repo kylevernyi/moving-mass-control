@@ -34,8 +34,14 @@ inline void toProtoQuaterniond(const Eigen::Quaterniond& quat, ::google::protobu
 
 // Conversion from Protobuf to custom struct
 inline telemetry_t fromProto(const TelemetryMessage& proto) {
+    Vector3d nu_top = fromProtoVector3d(proto.nu_top());
+    Vector3d nu_bot = fromProtoVector3d(proto.nu_bottom());
+    Vector6d nu; nu << nu_top, nu_bot;
+    std::vector<Vector6d> nu_vec; nu_vec.push_back(nu);
+
     return 
     {
+
         proto.time(),
         fromProtoQuaterniond(proto.q_b2i()),
         fromProtoQuaterniond(proto.q_i2d()),
@@ -44,8 +50,9 @@ inline telemetry_t fromProto(const TelemetryMessage& proto) {
         fromProtoVector3d(proto.rdot_mass()),
         fromProtoVector3d(proto.r_mass_commanded()),
         fromProtoVector3d(proto.u_com()),
-        fromProtoVector3d(proto.u_actual())
-
+        fromProtoVector3d(proto.u_actual()),
+        nu_vec,
+        fromProtoVector3d(proto.theta_hat())
     };
 }
 
@@ -55,12 +62,20 @@ inline TelemetryMessage toProto(const telemetry_t& t) {
     proto.set_time(t.time);
     toProtoQuaterniond(t.q_b2i, proto.mutable_q_b2i());
     toProtoQuaterniond(t.q_i2d, proto.mutable_q_i2d());
-    toProtoVector3d(t.omega_b2i, proto.mutable_omega_b2i());
+    toProtoVector3d(t.omega_b2i_B, proto.mutable_omega_b2i());
     toProtoVector3d(t.r_mass, proto.mutable_r_mass());
     toProtoVector3d(t.rdot_mass, proto.mutable_rdot_mass());
     toProtoVector3d(t.r_mass_commanded, proto.mutable_r_mass_commanded());
     toProtoVector3d(t.u_com, proto.mutable_u_com());
     toProtoVector3d(t.u_actual, proto.mutable_u_actual());
+    if (t.nu.size() > 0) {
+        toProtoVector3d(t.nu.front().segment(0,3), proto.mutable_nu_top());
+        toProtoVector3d(t.nu.front().segment(3,3), proto.mutable_nu_bottom());
+    } else {
+        proto.mutable_nu_top()->Add(0); proto.mutable_nu_top()->Add(0); proto.mutable_nu_top()->Add(0); 
+        proto.mutable_nu_bottom()->Add(0); proto.mutable_nu_bottom()->Add(0); proto.mutable_nu_bottom()->Add(0); 
+    }
+    toProtoVector3d(t.theta_hat, proto.mutable_theta_hat());
 
     return proto;
 }

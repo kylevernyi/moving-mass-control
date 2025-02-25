@@ -6,5 +6,5 @@ CXX_DEFINES = -DEXTRA -DINTERNAL
 
 CXX_INCLUDES = -I/home/kyle/school/s25/mmc/m2sat/include -I/home/kyle/school/s25/mmc/m2sat/build -I/home/kyle/school/s25/mmc/m2sat/vnproglib/cpp/include -I/home/kyle/school/s25/mmc/m2sat/cppzmq -I/home/kyle/school/s25/mmc/m2sat/controllers/include -isystem /usr/include/eigen3
 
-CXX_FLAGS = -std=gnu++17
+CXX_FLAGS = -O3 -DNDEBUG -std=gnu++17
 
