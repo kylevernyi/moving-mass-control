@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-src/src/catch2/.. -I/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-build/generated-includes
 
-CXX_FLAGS = -std=gnu++17 -ffile-prefix-map=/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-src/=
+CXX_FLAGS = -O3 -DNDEBUG -std=gnu++17 -ffile-prefix-map=/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-src/=
 

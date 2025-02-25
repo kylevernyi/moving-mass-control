@@ -46,6 +46,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/kyle/school/s25/mmc/m2sat/build/controllers/cmake_install.cmake")
   include("/home/kyle/school/s25/mmc/m2sat/build/libvncxx/cmake_install.cmake")
+  include("/home/kyle/school/s25/mmc/m2sat/build/REQUIRED/cmake_install.cmake")
 
 endif()
 
