@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "chrono": "cpp"
+    },
+    "python.analysis.extraPaths": [
+        "./m2sat/build/proto"
+    ]
+}
