@@ -2,37 +2,37 @@
 	"sources" : 
 	[
 		{
-			"file" : "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/CMakeFiles/catch2-populate"
+			"file" : "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/CMakeFiles/catch2-populate"
 		},
 		{
-			"file" : "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/CMakeFiles/catch2-populate.rule"
+			"file" : "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/CMakeFiles/catch2-populate.rule"
 		},
 		{
-			"file" : "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/CMakeFiles/catch2-populate-complete.rule"
+			"file" : "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/CMakeFiles/catch2-populate-complete.rule"
 		},
 		{
-			"file" : "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-build.rule"
+			"file" : "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-build.rule"
 		},
 		{
-			"file" : "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-configure.rule"
+			"file" : "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-configure.rule"
 		},
 		{
-			"file" : "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-download.rule"
+			"file" : "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-download.rule"
 		},
 		{
-			"file" : "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-install.rule"
+			"file" : "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-install.rule"
 		},
 		{
-			"file" : "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-mkdir.rule"
+			"file" : "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-mkdir.rule"
 		},
 		{
-			"file" : "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-patch.rule"
+			"file" : "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-patch.rule"
 		},
 		{
-			"file" : "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-test.rule"
+			"file" : "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-test.rule"
 		},
 		{
-			"file" : "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-update.rule"
+			"file" : "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/catch2-populate-update.rule"
 		}
 	],
 	"target" : 

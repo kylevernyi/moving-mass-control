@@ -2,6 +2,11 @@
 #include <zmq.hpp>
 #include <thread>
 #include <random>
+#include <csignal>
+#include <cstdlib>
+#include <termios.h>
+#include <unistd.h>
+
 #include "controller.h"
 #include "telemetry_conversion.h"
 #include "ClockManager.h"
@@ -13,6 +18,8 @@
 #define ACTUATION_RATE_HZ (100)
 
 uint64_t getTimestamp();
+void signalHandler(int signum);
+void waitForKeyPress();
 
 /* IMU access variables */
 std::mutex imu_mutex;
@@ -23,15 +30,21 @@ zmq::context_t context(1);
 zmq::socket_t telemetry_socket(context, zmq::socket_type::pub);
 
 /* Stepper motors */
-static const std::vector<uint8_t> tic_id = {0,1,2}; // x y z motor id in the firmware of the tic. must match!
+static const std::vector<uint8_t> tic_id = {100,101,102}; // x y z motor id in the firmware of the tic. must match!
 int stepper_i2c_fd;  // only 1 file descriptor for the i2c bus required 
 
 bool kalman_filter_initialized = false;
 
+static uint64_t exp_start_time;
 
 int main()
 {
-    static const uint64_t start_main = getTimestamp(); 
+    /* Signal catching stuff for clean exits */
+    struct sigaction sigIntHandler;
+    sigIntHandler.sa_handler = signalHandler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+    sigaction(SIGINT, &sigIntHandler, nullptr);
 
     /* Add clocks for loop timing*/
     ClockManager clockManager;
@@ -46,19 +59,27 @@ int main()
     ConnectAndConfigureIMU(&imu_data, &imu_mutex);
     
     /* Start TIC communication */
-    int stepper_i2c_fd = open_i2c_device(TIC_I2C_ADDRESS_DEVICE);
+    stepper_i2c_fd = open_i2c_device(TIC_I2C_ADDRESS_DEVICE);
     if (stepper_i2c_fd < 0) 
     {
-        // std::cout << "could not connect to i2c bus" << std::endl;
-    } 
-    
+        std::cout << "Could not connect to i2c bus!!!" << std::endl;
+    } else // configure the tics
+    {
+        for (auto iter = tic_id.begin(); iter != tic_id.end(); iter++)
+        {
+            SetTicSettings(stepper_i2c_fd, *iter); 
+        } 
+    }
 
     /* Groundstation communication */
     telemetry_socket.bind("tcp://*:5555");  // Bind to TCP port 5555
 
-    
-    telemetry_t tele;
-    telemetry_t controller_output;
+    telemetry_t tele; // default initilziation to zeros already no need for memset zeros
+    telemetry_t controller_output; 
+
+    waitForKeyPress(); // manual starting of the experiment. steppers are sent to the origin and held there
+
+    exp_start_time = getTimestamp(); 
 
     while (true) {
         auto start = high_resolution_clock::now(); // timestamp
@@ -91,7 +112,7 @@ int main()
         if (check_controller_clock.first && (imu_data.valid_data == true)) // if sufficient time elapsed and we have imu data
         {
             controller_output = Controller(tele, check_controller_clock.second.count());
-            controller_output.time = getTimestamp() - start_main;
+            controller_output.time = getTimestamp() - exp_start_time;
         }
 
         /* Actuate motors */
@@ -99,6 +120,7 @@ int main()
         {
             std::vector<int32_t> motor_shaft_position_pulses = ConvertMassPositionToMotorPosition(
                 controller_output.r_mass_commanded.x(), controller_output.r_mass_commanded.y(), controller_output.r_mass_commanded.z());
+
             // Send motor position commands to motors
             for (uint8_t i = 0; i<3; i++) {
                 tic_exit_safe_start(stepper_i2c_fd, tic_id.at(i));
@@ -116,7 +138,7 @@ int main()
             msg.SerializeToString(&serialized_msg);
             zmq::message_t zmq_msg(serialized_msg.data(), serialized_msg.size());
             telemetry_socket.send(zmq_msg, zmq::send_flags::none);
-            controller_output.Disp();
+            // controller_output.Disp();
         }
         
         /* Loop timing business */
@@ -131,6 +153,15 @@ int main()
 }
 
 
+void signalHandler(int signum) {
+    std::cout << "\nCaught signal " << signum << ", performing cleanup...\n";
+    // deenergize steppers on exit
+    for (auto iter = tic_id.begin(); iter != tic_id.end(); iter++)
+    {
+        tic_deenergize(stepper_i2c_fd, *iter);
+    } 
+    std::exit(signum);
+}
 
 
 uint64_t getTimestamp() {
@@ -142,4 +173,25 @@ uint64_t getTimestamp() {
     auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
 
     return static_cast<uint64_t>(milliseconds);
+}
+
+void waitForKeyPress() {
+    std::cout << "Press any key to start the experiment\n";
+
+    struct termios oldt, newt;
+    tcgetattr(STDIN_FILENO, &oldt);  // Get current terminal settings
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO); // Disable line buffering and echo
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+
+    while (true)
+    {
+        /* Send to origin to not timeout */
+        SendAllTicsHome(stepper_i2c_fd, tic_id.data());
+        char c;
+        if (read(STDIN_FILENO, &c, 1) > 0) break; // Break on key press
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);  // Restore terminal settings
 }

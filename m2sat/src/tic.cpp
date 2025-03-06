@@ -1,13 +1,9 @@
-// Uses the Linux I2C API to send and receive data from a Tic.
-// NOTE: The Tic's control mode must be "Serial / I2C / USB".
-// NOTE: For reliable operation on a Raspberry Pi, enable the i2c-gpio
-// overlay and use the I2C device it provides (usually /dev/i2c-3).
-// NOTE: You might need to change the 'const char * device' line below
-// to specify the correct I2C device.
-// NOTE: You might need to change the `const uint8_t address' line below
-// to match the device number of your Tic.
-
 #include "tic.h"
+#include <cstdint>
+#include <cmath>
+#include <iostream>
+#include <chrono>
+#include <thread>
 // Opens the specified I2C device.  Returns a non-negative file descriptor
 // on success, or -1 on failure.
 int open_i2c_device(const char * device)
@@ -43,7 +39,7 @@ int tic_exit_safe_start(int fd, uint8_t address)
 int tic_set_target_position(int fd, uint8_t address, int32_t target)
 {
     uint8_t command[] = {
-        0xE0,
+        ADDR_SET_TARGET_POSITION,
         (uint8_t)(target >> 0 & 0xFF),
         (uint8_t)(target >> 8 & 0xFF),
         (uint8_t)(target >> 16 & 0xFF),
@@ -64,7 +60,7 @@ int tic_set_target_position(int fd, uint8_t address, int32_t target)
 int tic_get_variable(int fd, uint8_t address, uint8_t offset,
 uint8_t * buffer, uint8_t length)
 {
-    uint8_t command[] = { 0xA1, offset };
+    uint8_t command[] = { ADDR_GET_VARIABLE, offset };
     struct i2c_msg messages[] = {
         { address, 0, sizeof(command), command },
         { address, I2C_M_RD, length, buffer },
@@ -72,12 +68,30 @@ uint8_t * buffer, uint8_t length)
     struct i2c_rdwr_ioctl_data ioctl_data = { messages, 2 };
     int result = ioctl(fd, I2C_RDWR, &ioctl_data);
     if (result != 2) {
-    // perror("failed to get variables");
+    perror("failed to get variables");
     return -1;
     }
 
     return 0;
 }
+
+int tic_get_target_position(int fd, uint8_t address, int32_t * result)
+{
+    tic_get_variable(fd, address, ADDR_GET_CURRENT_TARGET_POSITION, (uint8_t*)result, sizeof(int32_t));
+    return 0;
+}
+
+misc_flags_1_t tic_get_misc_flags(int fd, uint8_t address)
+{
+    uint8_t result;
+    tic_get_variable(fd, address, ADDR_MISC_FLAGS_1, &result, sizeof(uint8_t));
+
+    misc_flags_1_t flag_1;
+    flag_1.all = result;
+
+    return flag_1;
+}
+
 
 // Gets the "Current position" variable from the Tic.
 // Returns 0 for success, -1 for failure.
@@ -85,52 +99,188 @@ int tic_get_current_position(int fd, uint8_t address, int32_t * output)
 {
     *output = 0;
     uint8_t buffer[4];
-    int result = tic_get_variable(fd, address, 0x22, buffer, sizeof(buffer));
+    int result = tic_get_variable(fd, address, ADDR_CURRENT_POSITION, buffer, sizeof(buffer));
     if (result) { return -1; }
     *output = buffer[0] + ((uint32_t)buffer[1] << 8) +
     ((uint32_t)buffer[2] << 16) + ((uint32_t)buffer[3] << 24);
     return 0;
 }
 
-// todo
 int tic_get_current_velocity(int fd, uint8_t address, int32_t * output)
 {
     *output = 0;
     uint8_t buffer[4];
-    // int result = tic_get_variable(fd, address, 0x22, buffer, sizeof(buffer));
-    // if (result) { return -1; }
-    // *output = buffer[0] + ((uint32_t)buffer[1] << 8) +
-    // ((uint32_t)buffer[2] << 16) + ((uint32_t)buffer[3] << 24);
+    int result = tic_get_variable(fd, address, ADDR_CURRENT_VELOCITY, buffer, sizeof(buffer));
+    if (result) { return -1; }
+    *output = buffer[0] + ((uint32_t)buffer[1] << 8) +
+    ((uint32_t)buffer[2] << 16) + ((uint32_t)buffer[3] << 24);
     return 0;
 }
 
 
-// int main()
-// {
-// // Choose the I2C device.
-// const char * device = "/dev/i2c-1";
+int tic_set_max_speed(int fd, uint8_t address, int32_t max_speed)
+{
+    uint8_t command[] = {
+        ADDR_SET_MAX_SPEED,
+        (uint8_t)(max_speed >> 0 & 0xFF),
+        (uint8_t)(max_speed >> 8 & 0xFF),
+        (uint8_t)(max_speed >> 16 & 0xFF),
+        (uint8_t)(max_speed >> 24 & 0xFF),
+    };
+    struct i2c_msg message = { address, 0, sizeof(command), command };
+    struct i2c_rdwr_ioctl_data ioctl_data = { &message, 1 };
+    int result = ioctl(fd, I2C_RDWR, &ioctl_data);
+    if (result != 1) {
+        perror("failed to set max speed");
+        return -1;
+    }
+    return 0;
+}
 
-// // Set the I2C address of the Tic (the device number).
-// const uint8_t address = 14;
+int tic_set_starting_speed(int fd, uint8_t address, int32_t starting_speed)
+{
+    uint8_t command[] = {
+        ADDR_SET_STARTING_SPEED,
+        (uint8_t)(starting_speed >> 0 & 0xFF),
+        (uint8_t)(starting_speed >> 8 & 0xFF),
+        (uint8_t)(starting_speed >> 16 & 0xFF),
+        (uint8_t)(starting_speed >> 24 & 0xFF),
+    };
+    struct i2c_msg message = { address, 0, sizeof(command), command };
+    struct i2c_rdwr_ioctl_data ioctl_data = { &message, 1 };
+    int result = ioctl(fd, I2C_RDWR, &ioctl_data);
+    if (result != 1) {
+        perror("failed to set starting speed");
+        return -1;
+    }
+    return 0;
+}
 
-// int fd = open_i2c_device(device);
-// if (fd < 0) { return 1; }
+int tic_set_max_accel(int fd, uint8_t address, int32_t max_accel)
+{
+    uint8_t command[] = {
+        ADDR_SET_MAX_ACCEL,
+        (uint8_t)(max_accel >> 0 & 0xFF),
+        (uint8_t)(max_accel >> 8 & 0xFF),
+        (uint8_t)(max_accel >> 16 & 0xFF),
+        (uint8_t)(max_accel >> 24 & 0xFF),
+    };
+    struct i2c_msg message = { address, 0, sizeof(command), command };
+    struct i2c_rdwr_ioctl_data ioctl_data = { &message, 1 };
+    int result = ioctl(fd, I2C_RDWR, &ioctl_data);
+    if (result != 1) {
+        perror("failed to set max accel");
+        return -1;
+    }
+    return 0;
+    return 0;
+}
 
-// int result;
+int tic_set_current_limit(int fd, uint8_t address, uint8_t current_limit)
+{
+    uint8_t command[] = {
+        ADDR_SET_CURRENT_LIMIT,
+        current_limit
+    };
+    struct i2c_msg message = { address, 0, sizeof(command), command };
+    struct i2c_rdwr_ioctl_data ioctl_data = { &message, 1 };
+    int result = ioctl(fd, I2C_RDWR, &ioctl_data);
+    if (result != 1) {
+        perror("failed to set current limit");
+        return -1;
+    }
+    return 0;
+}
 
-// int32_t position;
-// result = tic_get_current_position(fd, address, &position);
-// if (result) { return 1; }
-// printf("Current position is %d.\n", position);
+int tic_set_step_mode(int fd, uint8_t address, uint8_t step_mode)
+{
+    uint8_t command[] = {
+        ADDR_SET_STEP_MODE,
+        step_mode
+    };
+    struct i2c_msg message = { address, 0, sizeof(command), command };
+    struct i2c_rdwr_ioctl_data ioctl_data = { &message, 1 };
+    int result = ioctl(fd, I2C_RDWR, &ioctl_data);
+    if (result != 1) {
+        perror("failed to set step mode");
+        return -1;
+    }
+    return 0;
+}
 
-// int32_t new_target = position > 0 ? -200 : 200;
-// printf("Setting target position to %d.\n", new_target);
-// result = tic_exit_safe_start(fd, address);
-// if (result) { return 1; }
-// result = tic_set_target_position(fd, address, new_target);
-// if (result) 
-//     { return 1; }
 
-// close(fd);
-// return 0;
-// }
+int tic_deenergize(int fd, uint8_t address)
+{
+     uint8_t command[] = {
+        ADDR_ENERGIZE
+    };
+    struct i2c_msg message = { address, 0, sizeof(command), command };
+    struct i2c_rdwr_ioctl_data ioctl_data = { &message, 1 };
+    int result = ioctl(fd, I2C_RDWR, &ioctl_data);
+    if (result != 1) {
+        perror("failed to deenergize");
+        return -1;
+    }
+    return 0;
+}
+
+
+int tic_go_home(int fd, uint8_t address)
+{
+    uint8_t command[] = {
+        ADDR_GO_HOME,
+        (uint8_t) 0
+    };
+    struct i2c_msg message = { address, 0, sizeof(command), command };
+    struct i2c_rdwr_ioctl_data ioctl_data = { &message, 1 };
+    int result = ioctl(fd, I2C_RDWR, &ioctl_data);
+    if (result != 1) {
+        perror("failed to go home");
+        return -1;
+    }
+    return 0;
+}
+
+uint8_t mapCurrentLimit(double current_mA)
+{
+    constexpr double MAX_CURRENT_MA = 3968.0;
+    constexpr uint8_t MAX_SETTING = 124;
+
+    // Ensure the input is within the valid range
+    if (current_mA <= 0) return 0;
+    if (current_mA >= MAX_CURRENT_MA) return MAX_SETTING;
+
+    // Compute the setting and round to the nearest integer
+    return static_cast<uint8_t>(std::round((current_mA / MAX_CURRENT_MA) * MAX_SETTING));
+}
+
+
+int SetTicSettings(int fd, uint8_t address)
+{
+    tic_deenergize(fd, address);
+    tic_set_current_limit(fd, address, mapCurrentLimit(TIC_CURRENT_LIMIT_MILLIAMPS));
+    tic_set_max_accel(fd, address, STEPPER_MAX_ACCEL_PPS2*PPS2_UNIT_CONVERSION);
+    tic_set_max_speed(fd, address, STEPPER_MAX_PULSES_PER_SEC*PPS_UNIT_CONVERSION);
+    tic_set_starting_speed(fd,address, STEPPER_START_SPEED_PPS*PPS_UNIT_CONVERSION);
+    tic_set_step_mode(fd, address, STEPPER_STEP_MODE);
+    tic_go_home(fd, address);
+
+    misc_flags_1_t flags;
+    flags = tic_get_misc_flags(fd, address);
+    while (flags.bits.positionUncertain == true) // wait till we get home
+    {
+        flags = tic_get_misc_flags(fd, address);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+
+    std::cout << "Configured Tic: " << int(address) << std::endl;
+    return 0;
+}
+
+int SendAllTicsHome(int fd, const uint8_t *addresses)
+{
+    tic_set_target_position(fd, 100, int32_t(X_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES));
+    tic_set_target_position(fd, 101, int32_t(Y_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES));
+    tic_set_target_position(fd, 102, int32_t(Z_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES));
+    return 0;
+}

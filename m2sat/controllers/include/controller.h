@@ -1,19 +1,23 @@
 #pragma once
+
 /**
  * Main controller code. 
  * Also handles some stepper motor and belt pulley conversions.
  * It is assumed that moving mass 1 moves along the x axis, 2 along y, and 3 along z.
  */
-#include "kalman.h"
 #include <Eigen/Dense>
+#include <algorithm>
+
+#include "kalman.h"
 #include "telemetry.h"
+#include "tic.h"
 
 #define CONTROLLER_RATE_HZ (100)
 
 /* Stepper motor configurations */
 #define TAU (2*M_PI)
 #define STEPPER_STEPS_PER_REV (200.0f) // full stepping (1.8 degree step angle)
-#define PULSES_UNIT_CONVERSION (10000.0f) // polulu uses pulses per 10,000 seconds instead of per second
+// #define PULSES_UNIT_CONVERSION (10000.0f) // polulu uses pulses per 10,000 seconds instead of per second
 
 /* Gear train confifuration */
 #define X_GEAR_RATIO (1.0f) // axel teeth : stepper shaft teeth
@@ -28,9 +32,9 @@ using namespace Eigen;
 /* Gains in Control Law u */
 static const double K = 1e-6; // Derivative
 static const Matrix3d alpha = (Matrix3d() << 
-    1e-6, 0.0, 0.0, 
-    0.0, 1e-6, 0.0, 
-    0.0, 0.0, 1e-6).finished(); // proportional gain
+    1e-1, 0.0, 0.0, 
+    0.0, 1e-1, 0.0, 
+    0.0, 0.0, 1e-1).finished(); // proportional gain
 
 static const Matrix3d gamma_gain = (Matrix3d() << 
     1e-5, 0.0, 0.0, 
@@ -60,21 +64,29 @@ static const Matrix3d J0 = (Matrix3d() <<
     0.0, Jyy, 0.0, 
     0.0, 0.0, Jzz).finished();
 
-static const double M = 4.2; // Simulator mass
-static const double m_x = 0.3; // Actuator masses
-static const double m_y = 0.3; // Actuator masses
-static const double m_z = 0.3; // Actuator masses
+static const double M = 6.5; // Simulator mass kg
+static const double m_x = 260*1e-3; // Actuator masses kg
+static const double m_y = 260*1e-3; // Actuator masses kg
+static const double m_z = 268*1e-3; // Actuator masses kg
 static const DiagonalMatrix<double,3> mm_mass_matrix(m_x,m_y,m_z); // moving mass' mass matrix
-static const double m_x_initial_position_meters = 0;
-static const double m_y_initial_position_meters = 0;
-static const double m_z_initial_position_meters = 0;
+static const double m_x_max_pos_meters = 95*1e-3; // assume saturation bounds are symmetrical
+static const double m_y_max_pos_meters = 95*1e-3; // assume saturation bounds are symmetrical
+static const double m_z_max_pos_meters = 100*1e-3; // needs calibrated still (not symmetrical)
+static const double m_z_min_pos_meters = 0; // needs calibrated still (not symmetrical)
+static const double m_x_initial_position_meters = m_x_max_pos_meters; // this is where the mass starts relative to the limit switch
+static const double m_y_initial_position_meters = m_y_max_pos_meters;
+static const double m_z_initial_position_meters = m_z_min_pos_meters;
+
 
 static const Vector3d g_I = (Vector3d() << 0,0, 9.81).finished(); // % Gravity vector
 
+/* Main controller functions */
 telemetry_t Controller(telemetry_t t, double dt_seconds);
 Vector3d CalcTorqueCommand();
 Vector3d CalcMassPositionFromTorqueCommand(Vector3d u_com);
+Vector3d SaturationLimit(Vector3d r_com);
 
+/* Motor mapping functions*/
 Vector3d ConvertMotorPositionToMassPosition(int32_t x, int32_t y, int32_t z);
 Vector3d ConvertMotorSpeedToMassVelocity(int32_t xdot, int32_t ydot, int32_t zdot );
 std::vector<int32_t> ConvertMassPositionToMotorPosition(double x_pos, double y_pos, double z_pos);
@@ -82,5 +94,5 @@ std::vector<int32_t> ConvertMassPositionToMotorPosition(double x_pos, double y_p
 int InitKalmanFilter(Vector3d omega_b2i_measurement, Quaterniond q_i2b_0);
 
 
-// Function to compute the skew-symmetric matrix
-Matrix3d skew(const Eigen::Vector3d& v);
+Matrix3d skew(const Eigen::Vector3d& v); // Function to compute the skew-symmetric matrix
+

@@ -9,6 +9,7 @@ static std::vector<Matrix<double,6,6>> Sigma;
 static std::vector<Matrix<double,6,6>> Pi;
 static std::vector<Matrix<double,6,3>> lambda;
 static std::vector<Vector<double,3>> omega_b2i_B_meas;
+
 // if isempty(nu)
 //     % nu = [omega; omega_dot];
 //     nu = [omega_b2i_B; zeros(3,1)]; % initialize kalman filter to state

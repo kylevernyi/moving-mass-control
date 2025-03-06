@@ -23,11 +23,11 @@ void ConnectAndConfigureIMU(imu_data_vn_format_t * imu_data, std::mutex * imu_mu
 	
     // VN100 is rotated 90 degrees about the z axis, rotate it -90 to align it back
     // const vn::math::mat3f rotationMatrix(1.0,  0.0f,  0.0f, 
-                                //    0.0f, 1,  0, 
-                                    // 0,  0,  1.0f);
+    //                                0.0f, 1,  0, 
+    //                                 0,  0,  1.0f);
     // vs.writeReferenceFrameRotation(rotationMatrix, true);
     // const vn::math::mat3f reg_value = vs.readReferenceFrameRotation();
-    // std::cout << str(reg_value) << std::endl;
+    // // std::cout << str(reg_value) << std::endl;
     
     // vs.writeSettings(true); // write and reset required
     // vs.reset(true);

@@ -22,12 +22,7 @@ using namespace vn::xplat;
 /* IF THE  VN_IMU_OUTPUT_FORMAT IS CHANGED, THEN THE PARSE FUNCTION IN imu.c MUST ALSO BE CHANGED*/
 static const  vn::protocol::uart::AsciiAsync imu_connection_mode = vn::protocol::uart::VNQMR;
 
-/**
- * The IMU is mounted 90 degrees clockwise about the z axis relative to our body coordinate system
- * This rotation converts from imu frame to the body frame.
- */
-const Eigen::Matrix3d imu2body = Eigen::AngleAxisd(-M_PI/2, Eigen::Vector3d::UnitZ()).toRotationMatrix();
-const Eigen::Quaterniond imu2body_quat(imu2body);
+static const Quaterniond q_b2imu(std::sqrt(0.5), 0, std::sqrt(0.5), 0); // imu is rotated around body frame y axis by positive 90 degrees which is this quaternion
 
 struct imu_data_vn_format_t
 {
@@ -45,22 +40,22 @@ struct imu_data_vn_format_t
         tele->q_b2i.x() = quaternion.x;
         tele->q_b2i.y() = quaternion.y;
         tele->q_b2i.z() = quaternion.z;
-        // tele->imu.q = imu2body_quat * tele->imu.q; // rotate
 
-        // // convert to euler here 
-        // tele->imu.euler = tele->imu.q.toRotationMatrix().eulerAngles(0, 1, 2); // todo check this
-        // tele->imu.euler = imu2body * tele->imu.euler; // rotate
-
-        // /* Note, the imu is mounted with the positive y of the imu = -x of the body frame. positive x imu = positive y body */
-        // // accelerations
-        // tele->imu.accel.x() = acceleration.x;
-        // tele->imu.accel.y() = acceleration.y; 
-        // tele->imu.accel.z() = -acceleration.z; 
-
+        tele->q_b2i =  q_b2imu.inverse()*tele->q_b2i; 
+        
         // body angular velocity
         tele->omega_b2i_B.x() = angularRate.x; 
         tele->omega_b2i_B.y() = angularRate.y; 
         tele->omega_b2i_B.z() = angularRate.z;    
+        // apply rotation to map imu frame to body frame on ang velocity
+        tele->omega_b2i_B = quat_rotate(q_b2imu.inverse(), tele->omega_b2i_B);
+    }
+
+    Vector3d quat_rotate(const Quaterniond& q, const Vector3d& v)
+    {
+        Quaterniond v_quat(0, v.x(), v.y(), v.z());  // Pure quaternion [0; v]
+        Quaterniond rotated = q * v_quat * q.conjugate();  // q * [0; v] * q^*
+        return rotated.vec();  // Extract the vector part (x, y, z)
     }
 
     
