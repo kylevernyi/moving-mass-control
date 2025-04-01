@@ -4,7 +4,7 @@
 #include <chrono>
 #include <iostream> 
 
-#define TELEMETRY_SEND_RATE_HZ (20) 
+#define TELEMETRY_SEND_RATE_HZ (40) 
 using namespace Eigen;
 typedef Vector<double, 6> Vector6d;
 
@@ -13,12 +13,12 @@ struct telemetry_t
     uint64_t time = 0;
     Quaterniond q_b2i = Quaterniond::Identity(); // q from body to inertial (from IMU)
     Quaterniond q_i2d = Quaterniond::Identity();
-    Vector3d omega_b2i_B = Vector3d::Zero(); // angular velocity of b2i in body frame (from IMU)
-    Vector3d r_mass = Vector3d::Zero(); //mass postion
-    Vector3d rdot_mass = Vector3d::Zero(); // mass velocity
-    Vector3d r_mass_commanded = Vector3d::Zero(); // commanded mass position
-    Vector3d u_com = Vector3d::Zero(); // commanded torque
-    Vector3d u_actual = Vector3d::Zero(); // actual control torque
+    Vector3d omega_b2i_B = Vector3d::Zero(); // angular velocity of b2i in body frame (from IMU) rad/sec
+    Vector3d r_mass = Vector3d::Zero(); //mass postion meters
+    Vector3d rdot_mass = Vector3d::Zero(); // mass velocity meters / sec
+    Vector3d r_mass_commanded = Vector3d::Zero(); // commanded mass position meters
+    Vector3d u_com = Vector3d::Zero(); // commanded torque Nm
+    Vector3d u_actual = Vector3d::Zero(); // actual control torque Nm
     std::vector<Vector6d> nu; // kalman filter estimate
     Vector3d theta_hat = Vector3d::Zero();
 

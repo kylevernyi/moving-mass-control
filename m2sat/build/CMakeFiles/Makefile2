@@ -65,6 +65,7 @@ CMAKE_BINARY_DIR = /home/bode/moving-mass-control/m2sat/build
 # The main recursive "all" target.
 all: CMakeFiles/proto_py.dir/all
 all: CMakeFiles/m2sat.dir/all
+all: CMakeFiles/tare_imu.dir/all
 all: controllers/all
 all: libvncxx/all
 all: REQUIRED/all
@@ -79,6 +80,7 @@ preinstall: REQUIRED/preinstall
 # The main recursive "clean" target.
 clean: CMakeFiles/proto_py.dir/clean
 clean: CMakeFiles/m2sat.dir/clean
+clean: CMakeFiles/tare_imu.dir/clean
 clean: controllers/clean
 clean: libvncxx/clean
 clean: REQUIRED/clean
@@ -235,7 +237,7 @@ libvncxx/clean: libvncxx/CMakeFiles/libvncxx.dir/clean
 CMakeFiles/proto_py.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/proto_py.dir/build.make CMakeFiles/proto_py.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/proto_py.dir/build.make CMakeFiles/proto_py.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=90 "Built target proto_py"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=89 "Built target proto_py"
 .PHONY : CMakeFiles/proto_py.dir/all
 
 # Build rule for subdir invocation for target.
@@ -262,12 +264,12 @@ CMakeFiles/m2sat.dir/all: controllers/CMakeFiles/controllers.dir/all
 CMakeFiles/m2sat.dir/all: libvncxx/CMakeFiles/libvncxx.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/m2sat.dir/build.make CMakeFiles/m2sat.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/m2sat.dir/build.make CMakeFiles/m2sat.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=85,86,87,88 "Built target m2sat"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=84,85,86,87 "Built target m2sat"
 .PHONY : CMakeFiles/m2sat.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/m2sat.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 21
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 19
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/m2sat.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 0
 .PHONY : CMakeFiles/m2sat.dir/rule
@@ -282,18 +284,44 @@ CMakeFiles/m2sat.dir/clean:
 .PHONY : CMakeFiles/m2sat.dir/clean
 
 #=============================================================================
+# Target rules for target CMakeFiles/tare_imu.dir
+
+# All Build rule for target.
+CMakeFiles/tare_imu.dir/all: libvncxx/CMakeFiles/libvncxx.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tare_imu.dir/build.make CMakeFiles/tare_imu.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tare_imu.dir/build.make CMakeFiles/tare_imu.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=91 "Built target tare_imu"
+.PHONY : CMakeFiles/tare_imu.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/tare_imu.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 15
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/tare_imu.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 0
+.PHONY : CMakeFiles/tare_imu.dir/rule
+
+# Convenience name for target.
+tare_imu: CMakeFiles/tare_imu.dir/rule
+.PHONY : tare_imu
+
+# clean rule for target.
+CMakeFiles/tare_imu.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tare_imu.dir/build.make CMakeFiles/tare_imu.dir/clean
+.PHONY : CMakeFiles/tare_imu.dir/clean
+
+#=============================================================================
 # Target rules for target controllers/CMakeFiles/controllers.dir
 
 # All Build rule for target.
 controllers/CMakeFiles/controllers.dir/all:
 	$(MAKE) $(MAKESILENT) -f controllers/CMakeFiles/controllers.dir/build.make controllers/CMakeFiles/controllers.dir/depend
 	$(MAKE) $(MAKESILENT) -f controllers/CMakeFiles/controllers.dir/build.make controllers/CMakeFiles/controllers.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=67,68 "Built target controllers"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=67 "Built target controllers"
 .PHONY : controllers/CMakeFiles/controllers.dir/all
 
 # Build rule for subdir invocation for target.
 controllers/CMakeFiles/controllers.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 1
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 controllers/CMakeFiles/controllers.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 0
 .PHONY : controllers/CMakeFiles/controllers.dir/rule
@@ -314,12 +342,12 @@ controllers/CMakeFiles/controllers.dir/clean:
 libvncxx/CMakeFiles/libvncxx.dir/all:
 	$(MAKE) $(MAKESILENT) -f libvncxx/CMakeFiles/libvncxx.dir/build.make libvncxx/CMakeFiles/libvncxx.dir/depend
 	$(MAKE) $(MAKESILENT) -f libvncxx/CMakeFiles/libvncxx.dir/build.make libvncxx/CMakeFiles/libvncxx.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=70,71,72,73,74,75,76,77,78,79,80,81,82,83,84 "Built target libvncxx"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=70,71,72,73,74,75,76,77,78,79,80,81,82,83 "Built target libvncxx"
 .PHONY : libvncxx/CMakeFiles/libvncxx.dir/all
 
 # Build rule for subdir invocation for target.
 libvncxx/CMakeFiles/libvncxx.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 15
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 14
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 libvncxx/CMakeFiles/libvncxx.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 0
 .PHONY : libvncxx/CMakeFiles/libvncxx.dir/rule
@@ -1095,12 +1123,12 @@ REQUIRED/tests/CMakeFiles/ContinuousSubmit.dir/clean:
 _deps/catch2-build/src/CMakeFiles/Catch2.dir/all:
 	$(MAKE) $(MAKESILENT) -f _deps/catch2-build/src/CMakeFiles/Catch2.dir/build.make _deps/catch2-build/src/CMakeFiles/Catch2.dir/depend
 	$(MAKE) $(MAKESILENT) -f _deps/catch2-build/src/CMakeFiles/Catch2.dir/build.make _deps/catch2-build/src/CMakeFiles/Catch2.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65 "Built target Catch2"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64 "Built target Catch2"
 .PHONY : _deps/catch2-build/src/CMakeFiles/Catch2.dir/all
 
 # Build rule for subdir invocation for target.
 _deps/catch2-build/src/CMakeFiles/Catch2.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 65
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 64
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 _deps/catch2-build/src/CMakeFiles/Catch2.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 0
 .PHONY : _deps/catch2-build/src/CMakeFiles/Catch2.dir/rule
@@ -1121,7 +1149,7 @@ _deps/catch2-build/src/CMakeFiles/Catch2.dir/clean:
 _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/all: _deps/catch2-build/src/CMakeFiles/Catch2.dir/all
 	$(MAKE) $(MAKESILENT) -f _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/build.make _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/depend
 	$(MAKE) $(MAKESILENT) -f _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/build.make _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=66 "Built target Catch2WithMain"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=65,66 "Built target Catch2WithMain"
 .PHONY : _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/all
 
 # Build rule for subdir invocation for target.
@@ -1147,7 +1175,7 @@ _deps/catch2-build/src/CMakeFiles/Catch2WithMain.dir/clean:
 REQUIRED/examples/CMakeFiles/pubsub_multithread_inproc.dir/all:
 	$(MAKE) $(MAKESILENT) -f REQUIRED/examples/CMakeFiles/pubsub_multithread_inproc.dir/build.make REQUIRED/examples/CMakeFiles/pubsub_multithread_inproc.dir/depend
 	$(MAKE) $(MAKESILENT) -f REQUIRED/examples/CMakeFiles/pubsub_multithread_inproc.dir/build.make REQUIRED/examples/CMakeFiles/pubsub_multithread_inproc.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=91 "Built target pubsub_multithread_inproc"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=90 "Built target pubsub_multithread_inproc"
 .PHONY : REQUIRED/examples/CMakeFiles/pubsub_multithread_inproc.dir/all
 
 # Build rule for subdir invocation for target.
@@ -1173,12 +1201,12 @@ REQUIRED/examples/CMakeFiles/pubsub_multithread_inproc.dir/clean:
 REQUIRED/examples/CMakeFiles/hello_world.dir/all:
 	$(MAKE) $(MAKESILENT) -f REQUIRED/examples/CMakeFiles/hello_world.dir/build.make REQUIRED/examples/CMakeFiles/hello_world.dir/depend
 	$(MAKE) $(MAKESILENT) -f REQUIRED/examples/CMakeFiles/hello_world.dir/build.make REQUIRED/examples/CMakeFiles/hello_world.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=69 "Built target hello_world"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=68,69 "Built target hello_world"
 .PHONY : REQUIRED/examples/CMakeFiles/hello_world.dir/all
 
 # Build rule for subdir invocation for target.
 REQUIRED/examples/CMakeFiles/hello_world.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 REQUIRED/examples/CMakeFiles/hello_world.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/bode/moving-mass-control/m2sat/build/CMakeFiles 0
 .PHONY : REQUIRED/examples/CMakeFiles/hello_world.dir/rule
@@ -1199,7 +1227,7 @@ REQUIRED/examples/CMakeFiles/hello_world.dir/clean:
 REQUIRED/examples/CMakeFiles/multipart_messages.dir/all:
 	$(MAKE) $(MAKESILENT) -f REQUIRED/examples/CMakeFiles/multipart_messages.dir/build.make REQUIRED/examples/CMakeFiles/multipart_messages.dir/depend
 	$(MAKE) $(MAKESILENT) -f REQUIRED/examples/CMakeFiles/multipart_messages.dir/build.make REQUIRED/examples/CMakeFiles/multipart_messages.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=89 "Built target multipart_messages"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=88 "Built target multipart_messages"
 .PHONY : REQUIRED/examples/CMakeFiles/multipart_messages.dir/all
 
 # Build rule for subdir invocation for target.

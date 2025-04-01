@@ -26,19 +26,20 @@ int main(int argc, char *argv[])
 	// const string SensorPort = "/dev/ttyS1";                    // Linux format for physical serial port.
 	const string SensorPort = "/dev/ttyUSB0";                  // Linux format for virtual (USB) serial port.
 	// const string SensorPort = "/dev/tty.usbserial-FTXXXXXX";   // Mac OS X format for virtual (USB) serial port.
-	// const string SensorPort = "/dev/ttyS0";                    // CYGWIN format. Usually the Windows COM port number minus 1. This would connect to COM1.
+	// const string SensorPort = "/dev/tt/yS0";                    // CYGWIN format. Usually the Windows COM port number minus 1. This would connect to COM1.
 	const uint32_t SensorBaudrate = 115200;
 
 	// We create and connect to a sensor by the call below.
 	EzAsyncData* ez = EzAsyncData::connect(SensorPort, SensorBaudrate);
-
 	// Now let's display the latest yaw, pitch, roll data at 5 Hz for 5 seconds.
 	for (int i = 0; i < 25; i++)
 	{
 		Thread::sleepMs(200);
+		std::cout << "start" << std::endl;
 
 		// This reads the latest data that has been processed by the EzAsyncData class.
 		CompositeData cd = ez->currentData();
+		std::cout << "start" << std::endl;
 
 		// Make sure that we have some yaw, pitch, roll data.
 		if (!cd.hasYawPitchRoll())

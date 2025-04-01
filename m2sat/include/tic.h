@@ -8,9 +8,9 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#define STEPPER_STEPS_PER_REV (200.0f) // full stepping (1.8 degree step angle)
-#define PPS2_UNIT_CONVERSION (100.0f) // polulu uses pulses per 10,000 seconds instead of per second
-#define PPS_UNIT_CONVERSION (10000.0f) // polulu uses pulses per 10,000 seconds instead of per second
+#define STEPPER_STEPS_PER_REV (200.0f * STEPPER_STEP_MODE_NUMERIC) // (1.8 degree step angle full step)
+#define PPS2_UNIT_CONVERSION (100.0f) // polulu uses pulses per 10,000 seconds instead of per second (pulses per second squared)
+#define PPS_UNIT_CONVERSION (10000.0f) // polulu uses pulses per 10,000 seconds instead of per second (pulses per second)
 
 #define RAD_TO_REV (1/(2*M_PI))
 
@@ -20,7 +20,7 @@
 #define STEPPER_START_SPEED_PPS (200.0f) // speed the motor tries to start at, if too high, it stalls
 #define STEPPER_MAX_ACCEL_PPS2 (1000.0f)    // pulses per second squared, if we go higher, we need more current but we are already current limiting
 #define TIC_CURRENT_LIMIT_MILLIAMPS (1400)
-#define STEPPER_STEP_MODE_NUMERIC (2.0f)
+#define STEPPER_STEP_MODE_NUMERIC (2.0f) // 2 half step, 4 quater etc
 #define STEPPER_STEP_MODE (1) 
 /* per the stepper_step_mode documentation from polulu
 0: Full step
@@ -33,7 +33,7 @@
 #define TIC_I2C_ADDRESS_DEVICE "/dev/i2c-1"
 
 /* Physical parameters */
-#define X_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES (617.0f) // measured in half pulses
+#define X_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES (635.0f) // measured in half pulses
 #define Y_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES (650.0f)
 #define Z_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES (0.0f)
 

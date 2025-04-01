@@ -1,5 +1,6 @@
 /home/bode/moving-mass-control/m2sat/build/CMakeFiles/proto_py.dir
 /home/bode/moving-mass-control/m2sat/build/CMakeFiles/m2sat.dir
+/home/bode/moving-mass-control/m2sat/build/CMakeFiles/tare_imu.dir
 /home/bode/moving-mass-control/m2sat/build/CMakeFiles/edit_cache.dir
 /home/bode/moving-mass-control/m2sat/build/CMakeFiles/rebuild_cache.dir
 /home/bode/moving-mass-control/m2sat/build/CMakeFiles/list_install_components.dir

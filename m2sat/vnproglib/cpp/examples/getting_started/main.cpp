@@ -25,9 +25,9 @@ int main(int argc, char *argv[])
 	// constant below. Also, if you have changed your sensor from the factory
 	// default baudrate of 115200, you will need to update the baudrate
 	// constant below as well.
-	const string SensorPort = "COM3";                             // Windows format for physical and virtual (USB) serial port.
+	// const string SensorPort = "COM3";                             // Windows format for physical and virtual (USB) serial port.
 	// const string SensorPort = "/dev/ttyS1";                    // Linux format for physical serial port.
-	// const string SensorPort = "/dev/ttyUSB0";                  // Linux format for virtual (USB) serial port.
+	const string SensorPort = "/dev/ttyUSB0";                  // Linux format for virtual (USB) serial port.
 	// const string SensorPort = "/dev/tty.usbserial-FTXXXXXX";   // Mac OS X format for virtual (USB) serial port.
 	// const string SensorPort = "/dev/ttyS0";                    // CYGWIN format. Usually the Windows COM port number minus 1. This would connect to COM1.
 	const uint32_t SensorBaudrate = 115200;
@@ -35,10 +35,19 @@ int main(int argc, char *argv[])
 	// Now let's create a VnSensor object and use it to connect to our sensor.
 	VnSensor vs;
 	vs.connect(SensorPort, SensorBaudrate);
+	const vn::math::mat3f identity_matrix(1.0,  0.0f,  0.0f, 
+		0.0f, 1.0f,  0, 
+		0.0,  0, 1.0f);
+	const vn::math::mat3f rotationMatrix(0.0,  0.0f,  -1.0f, 
+		0.0f, 1,  0, 
+		1.0,  0, 0.0f);
+	vs.writeReferenceFrameRotation(rotationMatrix, true);
+	vs.writeSettings(true);
+	// vs.reset(true);
 
-	// Let's query the sensor's model number.
-	string mn = vs.readModelNumber();
-	cout << "Model Number: " << mn << endl;
+	vn::math::mat3f redMat = vs.readReferenceFrameRotation();
+	std::cout << redMat << std::endl;
+
 
 	// Get some orientation data from the sensor.
 	vec3f ypr = vs.readYawPitchRoll();
@@ -52,14 +61,6 @@ int main(int argc, char *argv[])
 	cout << "Current Acceleration: " << reg.accel << endl;
 	cout << "Current Angular Rates: " << reg.gyro << endl;
 
-	// Let's do some simple reconfiguration of the sensor. As it comes from the
-	// factory, the sensor outputs asynchronous data at 40 Hz. We will change
-	// this to 2 Hz for demonstration purposes.
-	uint32_t oldHz = vs.readAsyncDataOutputFrequency();
-	vs.writeAsyncDataOutputFrequency(2);
-	uint32_t newHz = vs.readAsyncDataOutputFrequency();
-	cout << "Old Async Frequency: " << oldHz << " Hz" << endl;
-	cout << "New Async Frequency: " << newHz << " Hz" << endl;
 
 	// For the registers that have more complex configuration options, it is
 	// convenient to read the current existing register configuration, change
@@ -72,6 +73,9 @@ int main(int argc, char *argv[])
 	vs.writeVpeBasicControl(vpeReg);
 	vpeReg = vs.readVpeBasicControl();
 	cout << "New Heading Mode: " << vpeReg.headingMode << endl;
+
+
+
 
 	// Up to now, we have shown some examples of how to configure the sensor
 	// and query for the latest measurements. However, this querying is a
