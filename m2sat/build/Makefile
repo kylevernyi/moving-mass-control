@@ -188,6 +188,19 @@ m2sat/fast:
 .PHONY : m2sat/fast
 
 #=============================================================================
+# Target rules for targets named tare_imu
+
+# Build rule for target.
+tare_imu: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tare_imu
+.PHONY : tare_imu
+
+# fast build rule for target.
+tare_imu/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tare_imu.dir/build.make CMakeFiles/tare_imu.dir/build
+.PHONY : tare_imu/fast
+
+#=============================================================================
 # Target rules for targets named controllers
 
 # Build rule for target.
@@ -727,6 +740,30 @@ src/tic.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/m2sat.dir/build.make CMakeFiles/m2sat.dir/src/tic.cpp.s
 .PHONY : src/tic.cpp.s
 
+tare_imu/main.o: tare_imu/main.cpp.o
+.PHONY : tare_imu/main.o
+
+# target to build an object file
+tare_imu/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tare_imu.dir/build.make CMakeFiles/tare_imu.dir/tare_imu/main.cpp.o
+.PHONY : tare_imu/main.cpp.o
+
+tare_imu/main.i: tare_imu/main.cpp.i
+.PHONY : tare_imu/main.i
+
+# target to preprocess a source file
+tare_imu/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tare_imu.dir/build.make CMakeFiles/tare_imu.dir/tare_imu/main.cpp.i
+.PHONY : tare_imu/main.cpp.i
+
+tare_imu/main.s: tare_imu/main.cpp.s
+.PHONY : tare_imu/main.s
+
+# target to generate assembly for a file
+tare_imu/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tare_imu.dir/build.make CMakeFiles/tare_imu.dir/tare_imu/main.cpp.s
+.PHONY : tare_imu/main.cpp.s
+
 telemetry.pb.o: telemetry.pb.cc.o
 .PHONY : telemetry.pb.o
 
@@ -800,6 +837,7 @@ help:
 	@echo "... m2sat"
 	@echo "... multipart_messages"
 	@echo "... pubsub_multithread_inproc"
+	@echo "... tare_imu"
 	@echo "... unit_tests"
 	@echo "... src/imu.o"
 	@echo "... src/imu.i"
@@ -810,6 +848,9 @@ help:
 	@echo "... src/tic.o"
 	@echo "... src/tic.i"
 	@echo "... src/tic.s"
+	@echo "... tare_imu/main.o"
+	@echo "... tare_imu/main.i"
+	@echo "... tare_imu/main.s"
 	@echo "... telemetry.pb.o"
 	@echo "... telemetry.pb.i"
 	@echo "... telemetry.pb.s"

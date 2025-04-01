@@ -43,4 +43,7 @@ include_directories(include ${EIGEN3_INCLUDE_DIRS} ${Protobuf_INCLUDE_DIRS}
 
     # Add the executable
 add_executable(m2sat ${sources} ${PROTO_SRCS} ${PROTO_HDRS})
+add_executable(tare_imu tare_imu/main.cpp)
+
 target_link_libraries(m2sat PRIVATE controllers Eigen3::Eigen protobuf::libprotobuf libvncxx zmq)
+target_link_libraries(tare_imu PRIVATE libvncxx)

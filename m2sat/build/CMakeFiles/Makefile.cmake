@@ -107,6 +107,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/proto_py.dir/DependInfo.cmake"
   "CMakeFiles/m2sat.dir/DependInfo.cmake"
+  "CMakeFiles/tare_imu.dir/DependInfo.cmake"
   "controllers/CMakeFiles/controllers.dir/DependInfo.cmake"
   "libvncxx/CMakeFiles/libvncxx.dir/DependInfo.cmake"
   "REQUIRED/tests/CMakeFiles/unit_tests.dir/DependInfo.cmake"

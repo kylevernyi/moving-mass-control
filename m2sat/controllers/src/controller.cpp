@@ -12,7 +12,7 @@ static Matrix<double, 3, Eigen::Dynamic> Tau_stack; // CL stacks
 static std::vector<Vector<double, 6>> nu; // estimated states time history
 static Vector3d omega_b2i_I_0;
 
-static Matrix3d J; // moment of inertia
+static Matrix3d J; // time varying moment of inertia
 
 
 // Helper functions
@@ -27,34 +27,39 @@ int rank(MatrixXd mat);
 Vector3d ConvertMotorPositionToMassPosition(int32_t x, int32_t y, int32_t z)
 {
     // rotational, maps units of the stepper motor to radians
-    double x_rad = double(x) * TAU * (1/STEPPER_STEPS_PER_REV); // 2pi radians per 200 counts
-    double y_rad = double(y) * TAU * (1/STEPPER_STEPS_PER_REV); // 2pi radians per 200 counts
-    double z_rad = double(z) * TAU * (1/STEPPER_STEPS_PER_REV); // 2pi radians per 200 counts
+    double x_rad = (double(x)-X_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES) * TAU * (1/STEPPER_STEPS_PER_REV) ; // (pos - initial) * 2pi radians / 200*step_mode  
+    double y_rad = (double(y)-Y_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES) * TAU * (1/STEPPER_STEPS_PER_REV) ; 
+    double z_rad = (double(z)-Z_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES) * TAU * (1/STEPPER_STEPS_PER_REV) ; 
+
+    // radians to meters
+    double x_pos =   x_rad * X_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000);  
+    double y_pos =   y_rad * Y_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000);  
+    double z_pos =   z_rad * Z_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000);  
     
-    double x_pos = m_x_initial_position_meters + x_rad * X_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000);
-    double y_pos = m_y_initial_position_meters + y_rad * Y_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000);
-    double z_pos = m_z_initial_position_meters + z_rad * Z_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000);
-    
-    Vector3d output; 
-    output << x_pos, y_pos, z_pos;
+    Vector3d output; output << x_pos, y_pos, z_pos;
+    // std::cout <<     x << "  " <<    y << "  " <<    z << std::endl;
+    // std::cout <<     x_rad << "  " <<    y_rad << "  " <<    z_rad << std::endl;
+    // std::cout << output.transpose() << "\n";
     return output;
 }
 
 /**
- * Convert the linear position of the mass back to total pulses of the motor
+ * Convert the linear position of the mass (meters) back to total pulses of the motor (pulses)
  */
 std::vector<int32_t> ConvertMassPositionToMotorPosition(double x_pos, double y_pos, double z_pos)
 {
     // Convert the mass position back to the motor's position in radians
-    double x_rad = (x_pos - m_x_initial_position_meters) / (X_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM / 1000));
-    double y_rad = (y_pos - m_y_initial_position_meters) / (Y_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM / 1000));
-    double z_rad = (z_pos - m_z_initial_position_meters) / (Z_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM / 1000));
+    double x_rad = (x_pos) / (X_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000)); // (x_pos) / (X_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM / 1000));
+    double y_rad = (y_pos) / (Y_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000)); // (y_pos) / (Y_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM / 1000));
+    double z_rad = (z_pos) / (Z_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000)); // (z_pos) / (Z_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM / 1000));
 
     // Convert radians back to pulses
-    int32_t x = int32_t(x_rad * STEPPER_STEPS_PER_REV / TAU);
-    int32_t y = int32_t(y_rad * STEPPER_STEPS_PER_REV / TAU);
-    int32_t z = int32_t(z_rad * STEPPER_STEPS_PER_REV / TAU);
+    int32_t x = int32_t(x_rad * STEPPER_STEPS_PER_REV / TAU) + int32_t(X_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES);
+    int32_t y = int32_t(y_rad * STEPPER_STEPS_PER_REV / TAU) + int32_t(Y_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES);
+    int32_t z = int32_t(z_rad * STEPPER_STEPS_PER_REV / TAU) + int32_t(Z_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES);
 
+    // std::cout << "m:" << x_pos << " " << y_pos << " " << z_pos << std::endl;
+    // std::cout << "p:" << x << " " << y << " " << z << std::endl;
     return std::vector<int32_t>{x,y,z};
 }
 
@@ -69,9 +74,9 @@ Vector3d ConvertMotorSpeedToMassVelocity(int32_t xdot, int32_t ydot, int32_t zdo
     double z_radians_per_sec = double(zdot) * TAU * (1/STEPPER_STEPS_PER_REV) * (1/PPS_UNIT_CONVERSION); // 2pi radians per 200 counts
     
     // linear = r * omega where r is pitch radius in meters and omega is angular velocity of the pulley
-    double x_linear = (X_GEAR_RATIO * x_radians_per_sec) * (PULLEY_PITCH_RADIUS_MM / 1000.0f); // account for gear ratio on angular velocity, pitch radius maps rot to linear
-    double y_linear = (Y_GEAR_RATIO * y_radians_per_sec) * (PULLEY_PITCH_RADIUS_MM / 1000.0f); // account for gear ratio on angular velocity, pitch radius maps rot to linear
-    double z_linear = (Z_GEAR_RATIO * z_radians_per_sec) * (PULLEY_PITCH_RADIUS_MM / 1000.0f); // account for gear ratio on angular velocity, pitch radius maps rot to linear
+    double x_linear = (X_GEAR_RATIO * x_radians_per_sec) * (PULLEY_PITCH_RADIUS_MM/1000.0f); // account for gear ratio on angular velocity, pitch radius maps rot to linear
+    double y_linear = (Y_GEAR_RATIO * y_radians_per_sec) * (PULLEY_PITCH_RADIUS_MM/1000.0f); // account for gear ratio on angular velocity, pitch radius maps rot to linear
+    double z_linear = (Z_GEAR_RATIO * z_radians_per_sec) * (PULLEY_PITCH_RADIUS_MM/1000.0f); // account for gear ratio on angular velocity, pitch radius maps rot to linear
 
     Vector3d output; 
     output << x_linear, y_linear, z_linear;
@@ -92,10 +97,13 @@ int InitKalmanFilter(Vector3d omega_b2i_measurement, Quaterniond q_i2b_0)
 int InitController()
 {
     // J needs initialized
-    J(0,0) = 1;
-    J(1,1) = 1;
-    J(2,2) = 1;
+    // J(0,0) = 1;
+    // J(1,1) = 1;
+    // J(2,2) = 1;
+    J = J0;
+    std::cout << "alpha gain: " << alpha << std::endl;
 
+    theta_hat << 0,0,0; // initial theta estimate goes here;
     return 0;
 }
 
@@ -109,8 +117,7 @@ int InitController()
 telemetry_t Controller(telemetry_t t, double dt_seconds)
 {
     telemetry_t controller_output = t; // maybe dont do this 
-    // Compute our actual control torque at the moment 
-    controller_output.u_actual = mm_mass_matrix * t.r_mass;
+
     // Extract states
     Quaterniond q_i2b = t.get_q_i2b();
     // Vector3d omega_b2i_B_hat = nu.back().head<3>();  // first 3 elements
@@ -138,7 +145,7 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     // Vector3d omega_b2d_B=  omega_b2i_B_hat - omega_d2i_B; // Omega Body w.r. Desired in BFF that has noise influece, used in control signal
 
     Vector3d r = omega_b2d_B + alpha*q_d2b.vec(); // Definition of r error signal
-    std::cout << (alpha*q_d2b.vec()).transpose() << std::endl;
+
 
     /* Update of J(t) as a function of new mass position */
     Matrix3d Jm_B_dot;
@@ -149,8 +156,7 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
 
     /* Compute basis function Phi */
     Vector3d g_B = quat_rotate(q_i2b.conjugate(), g_I);  //quat_mult(quat_mult(quat_conj(q_i2b),[0;g_I]),q_i2b);
-    Matrix3d g_b_x = skew(g_B); // Skew Matrix of Gravity Vector in BFF
-    Matrix3d Phi = -M*g_b_x; // Phi definition as in ref[DOI: 10.2514/1.60380]
+    Matrix3d Phi = -M*skew(g_B); // Phi definition as in ref[DOI: 10.2514/1.60380]
 
     /* Control Torque as Designed by Lyapunov Analysis */
     Matrix3d Proj_operator = ( Matrix3d::Identity() - (g_B*g_B.transpose()) ) / g_B.squaredNorm();
@@ -159,10 +165,13 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
 
     /* Map control Torque to mass positions */
     // Transformation of u_com to Commanded Positions as in ref[DOI: 10.2514/1.60380]
-    controller_output.r_mass_commanded = mm_mass_matrix.inverse() * (skew(g_B) * controller_output.u_com / g_B.squaredNorm() ); // desired commanded mass positions
+    controller_output.r_mass_commanded = mm_mass_matrix.inverse() * (g_B.cross(controller_output.u_com) / g_B.squaredNorm() ); // desired commanded mass positions
     // at this point, r_mass_commanded is relative to the middle zero position of the sliding masses (not the zero limit switch position)
     /* Make sure r_mass_commanded is within saturation limits (makes sense to apply here before stepper mapping) */
     controller_output.r_mass_commanded = SaturationLimit(controller_output.r_mass_commanded);
+
+    Vector3d u_com_check = quat_rotate(q_i2b, controller_output.u_com); //  quat_mult(  quat_mult(q_i2b,[0;u_com]),  quat_conj(q_i2b));
+    // std::cout << "u_com_check: " << u_com_check.transpose() << std::endl;
 
     /* Concurrent learning data selection algorithm */
     static int p_CL_idx = 0;
@@ -229,8 +238,14 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     
     /* Update law */
     Vector3d theta_hat_dot = gamma_gain * ( (Phi.transpose()*r)  + CL_on*CL_gain*concurrent_learning_Tau_ext); //  Adaptive update law
-
     controller_output.theta_hat += theta_hat_dot*dt_seconds; 
+
+    /* Compute our actual control torque at the moment for logging */
+    controller_output.u_actual = -mm_mass_matrix * g_B.cross(t.r_mass);
+    std::cout << "r_com: " << controller_output.r_mass_commanded.transpose() 
+    << "\nu_com: " << controller_output.u_com.transpose() 
+    << "\nu_act: " << controller_output.u_actual.transpose() << std::endl;
+
     return controller_output;
 }
 

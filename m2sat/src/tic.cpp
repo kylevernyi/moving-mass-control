@@ -270,7 +270,7 @@ int SetTicSettings(int fd, uint8_t address)
     while (flags.bits.positionUncertain == true) // wait till we get home
     {
         flags = tic_get_misc_flags(fd, address);
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(15));
     }
 
     std::cout << "Configured Tic: " << int(address) << std::endl;

@@ -1,0 +1,6 @@
+/home/bode/moving-mass-control/m2sat/vnproglib/cpp/examples/getting_started/build/CMakeFiles/getting_started.dir
+/home/bode/moving-mass-control/m2sat/vnproglib/cpp/examples/getting_started/build/CMakeFiles/edit_cache.dir
+/home/bode/moving-mass-control/m2sat/vnproglib/cpp/examples/getting_started/build/CMakeFiles/rebuild_cache.dir
+/home/bode/moving-mass-control/m2sat/vnproglib/cpp/examples/getting_started/build/libvncxx/CMakeFiles/libvncxx.dir
+/home/bode/moving-mass-control/m2sat/vnproglib/cpp/examples/getting_started/build/libvncxx/CMakeFiles/edit_cache.dir
+/home/bode/moving-mass-control/m2sat/vnproglib/cpp/examples/getting_started/build/libvncxx/CMakeFiles/rebuild_cache.dir

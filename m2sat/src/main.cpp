@@ -54,10 +54,18 @@ int main()
     clockManager.AddClock("telemetry", 1.0f / TELEMETRY_SEND_RATE_HZ);
     clockManager.AddClock("actuation", 1.0f / ACTUATION_RATE_HZ);
 
-
     /* Start IMU communication*/
     ConnectAndConfigureIMU(&imu_data, &imu_mutex);
     
+    /* Groundstation communication */
+    telemetry_socket.bind("tcp://*:5555");  // Bind to TCP port 5555
+
+    telemetry_t tele; // default initilziation to zeros already no need for memset zeros
+    // tele.q_i2d.w() = 0; tele.q_i2d.x() = 0; tele.q_i2d.y() = 0; tele.q_i2d.z() = 1;  // desired quaternion iniialization
+    tele.r_mass << 0,0,0; // masses start at origin
+
+    telemetry_t controller_output; 
+
     /* Start TIC communication */
     stepper_i2c_fd = open_i2c_device(TIC_I2C_ADDRESS_DEVICE);
     if (stepper_i2c_fd < 0) 
@@ -70,16 +78,12 @@ int main()
             SetTicSettings(stepper_i2c_fd, *iter); 
         } 
     }
-
-    /* Groundstation communication */
-    telemetry_socket.bind("tcp://*:5555");  // Bind to TCP port 5555
-
-    telemetry_t tele; // default initilziation to zeros already no need for memset zeros
-    telemetry_t controller_output; 
-
     waitForKeyPress(); // manual starting of the experiment. steppers are sent to the origin and held there
+    tare_heading(); // zero heading angle
 
     exp_start_time = getTimestamp(); 
+
+    InitController();
 
     while (true) {
         auto start = high_resolution_clock::now(); // timestamp
@@ -95,7 +99,7 @@ int main()
                 kalman_filter_initialized = true;
             }
         } 
-
+        
         /* Get Mass Positions and Velocities from motor controllers */
         int32_t motor_positions[3]; int32_t motor_velocities[3];
         for (int i = 0; i<3; i++)
@@ -120,11 +124,11 @@ int main()
         {
             std::vector<int32_t> motor_shaft_position_pulses = ConvertMassPositionToMotorPosition(
                 controller_output.r_mass_commanded.x(), controller_output.r_mass_commanded.y(), controller_output.r_mass_commanded.z());
-
             // Send motor position commands to motors
-            for (uint8_t i = 0; i<3; i++) {
+            for (uint8_t i = 0; i<3; i++) 
+            {
                 tic_exit_safe_start(stepper_i2c_fd, tic_id.at(i));
-                tic_set_target_position(stepper_i2c_fd,  tic_id.at(i), motor_shaft_position_pulses.at(i));
+                tic_set_target_position(stepper_i2c_fd, tic_id.at(i), motor_shaft_position_pulses.at(i));
             }
         }
 
@@ -175,23 +179,39 @@ uint64_t getTimestamp() {
     return static_cast<uint64_t>(milliseconds);
 }
 
-void waitForKeyPress() {
-    std::cout << "Press any key to start the experiment\n";
-
-    struct termios oldt, newt;
-    tcgetattr(STDIN_FILENO, &oldt);  // Get current terminal settings
-    newt = oldt;
+void setNonBlockingInput() {
+    struct termios newt;
+    tcgetattr(STDIN_FILENO, &newt);  // Get current terminal settings
     newt.c_lflag &= ~(ICANON | ECHO); // Disable line buffering and echo
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
-    while (true)
-    {
+    // Set stdin to non-blocking mode
+    int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
+}
+
+void restoreTerminalSettings(struct termios& oldt) {
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // Restore terminal settings
+}
+
+void waitForKeyPress() {
+    std::cout << "Press any key to start the experiment\n";
+
+    struct termios oldt;
+    tcgetattr(STDIN_FILENO, &oldt);  // Save current terminal settings
+    setNonBlockingInput();
+
+    while (true) {
         /* Send to origin to not timeout */
         SendAllTicsHome(stepper_i2c_fd, tic_id.data());
+
         char c;
-        if (read(STDIN_FILENO, &c, 1) > 0) break; // Break on key press
+        if (read(STDIN_FILENO, &c, 1) > 0) {
+            break; // Break on key press
+        }
+
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);  // Restore terminal settings
+    restoreTerminalSettings(oldt);
 }
