@@ -84,7 +84,7 @@ CSV_FIELDS = [
 
 # Colors to use for channels
 COLORS_3 = ['r', 'g', 'c']
-COLORS_4 = ['r', 'g', 'c', 'y']
+COLORS_4 = ['y', 'r', 'g', 'c'] # w x y z for eigen quaternion
 
 class WholeSecondAxis(pg.AxisItem):
     def tickStrings(self, values, scale, spacing):
@@ -96,7 +96,7 @@ class MultiTelemetryPlotter:
         # Set up ZeroMQ subscriber (TCP)
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.SUB)
-        self.socket.connect("tcp://localhost:5555")  # Update if needed
+        self.socket.connect("tcp://155.31.239.181:5555")  # Update if needed
         self.socket.setsockopt(zmq.SUBSCRIBE, b"")
 
         # Data buffers: time plus one buffer per field/channel.

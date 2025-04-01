@@ -62,7 +62,7 @@ J0 = diag([Jxx Jyy Jzz]);
 M = 4.2; % Simulator mass
 m1 = 0.3; m2 = 0.3; m3 = 0.3; % Actuator mass
 m = diag([m1,m2,m3]);
-g_I = [0;0;-9.81]; % Gravity vector
+g_I = [0;0;9.81]; % Gravity vector
 motor_bandwidth_hz = 10*eye(3);
 
 % Sensor Noise VN-100 (IMU) - Add if needed
@@ -74,7 +74,8 @@ sigma_omega = ND*sqrt(SR); % Noise Standard Deviation
 
 
 %% Initial Conditions
-omega_b2i_B_0 = [0.0288;0.01229;0.013611];
+% omega_b2i_B_0 = [0.0288;0.01229;0.3611];
+omega_b2i_B_0 = [0 0 0]';
 % omega_b2i_B_0 = 0.05*randn(3,1);
 q_i2b_0 = [1;0;0;0];%[0.484125,0.017008,0.125903,-0.86573]';
 euler_0 = quat2eul(q_i2b_0','ZYX');
@@ -322,7 +323,7 @@ JB_m_dot = 2*[sigma(2)*sigma_dot(2) + sigma(3)*sigma_dot(3), ...
                     sigma(1)*sigma_dot(1) + sigma(2)*sigma_dot(2)];% moment of inertia rate of change due to sliding masses (as a 3x1 vector)
 
 %% Transformation of Gravity Vector from Inertial to BFF
-g_B = quat_mult(quat_mult(quat_conj(q_i2b),[0;g_I]),q_i2b);
+g_B = quat_mult(quat_mult(quat_conj(q_i2b),[0;g_I]), q_i2b);
 g_B = g_B(2:4);
 g_b_x = skew(g_B); % Skew Matrix of Gravity Vector in BFF
 Phi = -M*g_b_x; % Phi definition as in ref[DOI: 10.2514/1.60380]
@@ -342,9 +343,10 @@ if (whole_timestep && integration_phase)
     + P*J*(omega_dot_d2i_B + cross(omega_d2i_B,omega_b2d_B) - 0.5*alpha*(skew(q_d2b(2:4)) + q_d2b(1)*eye(3))*omega_b2d_B); % desired torque 
 
     u_com_local = u_com(:,w_iter); % for zero order hold
-
+% u = [-1.54; 43.367; -25.11]
+u = [100; 0; 0];
     % Transformation of u_com to Commanded Positions as in ref[DOI: 10.2514/1.60380]
-    r_com(:,w_iter) = m\(cross(g_B, u_com_local)/(norm(g_B)^2)); % commanded mass positions
+    r_com(:,w_iter) = m\(cross(g_B, u)/(norm(g_B)^2)); % commanded mass positions
     r_com_local = r_com(:,w_iter); % commanded mass positions
 end
 

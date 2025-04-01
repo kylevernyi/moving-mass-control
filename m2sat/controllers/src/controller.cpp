@@ -145,7 +145,7 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     // Vector3d omega_b2d_B=  omega_b2i_B_hat - omega_d2i_B; // Omega Body w.r. Desired in BFF that has noise influece, used in control signal
 
     Vector3d r = omega_b2d_B + alpha*q_d2b.vec(); // Definition of r error signal
-    // std::cout << (alpha*q_d2b.vec()).transpose() << std::endl;
+
 
     /* Update of J(t) as a function of new mass position */
     Matrix3d Jm_B_dot;

@@ -1,0 +1,119 @@
+% time,omega_b2i_0,omega_b2i_1,omega_b2i_2,q_b2i_0,q_b2i_1,q_b2i_2,q_b2i_3,q_i2d_0,q_i2d_1,q_i2d_2,q_i2d_3,r_mass_0,r_mass_1,r_mass_2,rdot_mass_0,rdot_mass_1,rdot_mass_2,r_mass_commanded_0,r_mass_commanded_1,r_mass_commanded_2,u_com_0,u_com_1,u_com_2,u_actual_0,u_actual_1,u_actual_2,theta_hat_0,theta_hat_1,theta_hat_2
+% clc; close all;
+set(groot, 'DefaultTextInterpreter', 'latex'); % plot settings
+set(groot, 'DefaultLegendInterpreter', 'latex'); % plot settings
+set(groot, 'DefaultLineLineWidth', 2.1); set(groot, 'DefaultAxesFontSize', 12);
+
+%% Get csv file
+files = dir('logs/*.csv'); % Get all CSV files
+if ~isempty(files)
+    [~, idx] = max([files.datenum]); % Find the most recent file
+    newestFile = strcat('logs/',files(idx).name);
+    data = readtable(newestFile, 'ReadVariableNames', true); % Read data
+    fprintf('Loaded file: %s\n', newestFile);
+else
+    error('No CSV files found in the directory.');
+end
+
+q_i2b = [data.q_b2i_0, data.q_b2i_1, data.q_b2i_2, data.q_b2i_3];
+C = QuatToDCM(q_i2b);
+ypr = squeeze(EulerFromDCM(C))';
+
+%%
+m = [260; 260; 268] * 1e-3; % mass matrix
+r_max = [63; 63; 97.75] * 1e-3; % maximum offset 
+g_B_max = [0; 0; 9.81]; % gravity vectory associated with max torque is aligned with body 
+u_max = diag(m) * cross(-g_B_max, r_max); u_max(3) = 97.75*1e-3 * 268*1e-3 * 9.81;
+u_max = u_max*1000;
+% r_max_check = diag(m)\(cross(g_B_max,u_max)/(norm(g_B_max)^2))
+
+%% Plotting
+time = data.time / 1000; % to seconds
+
+% Plot \omega_{b2i}
+figure; 
+subplot(3,1,1); plot(time, data.omega_b2i_0, 'r'); legend('$\omega_{b2i,x}$'); ylabel('$\omega_{b2i}$ (rad/s)'); hold on;
+subplot(3,1,2); plot(time, data.omega_b2i_1, 'g'); legend('$\omega_{b2i,y}$'); ylabel('$\omega_{b2i}$ (rad/s)');
+subplot(3,1,3); plot(time, data.omega_b2i_2, 'b'); legend('$\omega_{b2i,z}$'); ylabel('$\omega_{b2i}$ (rad/s)');
+xlabel('Time (s)');  sgtitle('$\omega_{b2i}$');
+
+figure; sgtitle("Euler Angles");
+subplot(3,1,1); plot(time, ypr(:,1), 'r'); legend('yaw'); ylabel('yaw (rad)'); hold on;
+subplot(3,1,2); plot(time, ypr(:,2), 'g'); legend('pitch'); ylabel('pitch (rad)'); 
+subplot(3,1,3); plot(time, ypr(:,3), 'b'); legend('roll'); ylabel('roll (rad)');  
+xlabel('Time (s)');
+
+% Plot q_{b2i}
+% figure;
+% subplot(4,1,1); plot(time, data.q_b2i_0, 'k'); legend('$q_{b2i,0}$'); ylabel('$q_{b2i}$'); hold on;
+% subplot(4,1,2); plot(time, data.q_b2i_1, 'r'); legend('$q_{b2i,1}$'); ylabel('$q_{b2i}$'); 
+% subplot(4,1,3); plot(time, data.q_b2i_2, 'g'); legend('$q_{b2i,2}$'); ylabel('$q_{b2i}$'); 
+% subplot(4,1,4); plot(time, data.q_b2i_3, 'b'); legend('$q_{b2i,3}$'); ylabel('$q_{b2i}$'); 
+% xlabel('Time (s)'); sgtitle('$q_{b2i}$');
+
+% Plot q_{i2d}
+% figure; 
+% subplot(4,1,1); plot(time, data.q_i2d_0, 'k');  legend('$q_{i2d,0}$'); ylabel('$q_{i2d}$'); hold on;
+% subplot(4,1,2); plot(time, data.q_i2d_1, 'r'); legend('$q_{i2d,1}$'); ylabel('$q_{i2d}$');
+% subplot(4,1,3); plot(time, dau = [-1.54; 43.367; -25.11]ta.q_i2d_2, 'g'); legend('$q_{i2d,2}$'); ylabel('$q_{i2d}$');
+% subplot(4,1,4); plot(time, data.q_i2d_3, 'b'); legend('$q_{i2d,3}$'); ylabel('$q_{i2d}$');
+% xlabel('Time (s)');  sgtitle('$q_{i2d}$');
+
+% Position plots
+% figure;
+% subplot(3,1,1); plot(time, data.r_mass_0*1000, 'r'); legend('$r_{\mathrm{mass},x}$'); ylabel('$r_{\mathrm{mass}}$ (mm)'); hold on;
+% subplot(3,1,2); plot(time, data.r_mass_1*1000, 'g'); legend('$r_{\mathrm{mass},y}$'); ylabel('$r_{\mathrm{mass}}$ (mm)');
+% subplot(3,1,3); plot(time, data.r_mass_2*1000, 'b'); legend('$r_{\mathrm{mass},z}$'); ylabel('$r_{\mathrm{mass}}$ (mm)');
+% xlabel('Time (s)');
+% sgtitle('$r_{\mathrm{mass}}$');
+
+figure; 
+subplot(3,1,1); plot(time, data.rdot_mass_0, 'r'); legend('$\dot{r}_{\mathrm{mass},x}$'); ylabel('$\dot{r}_{\mathrm{mass}}$ (m/s)'); hold on;
+subplot(3,1,2); plot(time, data.rdot_mass_1, 'g'); legend('$\dot{r}_{\mathrm{mass},y}$'); ylabel('$\dot{r}_{\mathrm{mass}}$ (m/s)');
+subplot(3,1,3); plot(time, data.rdot_mass_2, 'b'); legend('$\dot{r}_{\mathrm{mass},z}$'); ylabel('$\dot{r}_{\mathrm{mass}}$ (m/s)');
+xlabel('Time (s)'); 
+sgtitle('$\dot{r}_{\mathrm{mass}}$');
+
+figure;
+subplot(3,1,1); plot(time, data.r_mass_commanded_0*1000, '--r', time, data.r_mass_0*1000, 'r'); legend('$r_{\mathrm{mass,cmd},x}$', '$r_{\mathrm{mass},x}$'); ylabel('$r$ (mm)'); hold on;
+subplot(3,1,2); plot(time, data.r_mass_commanded_1*1000, '--g', time, data.r_mass_1*1000, 'g'); legend('$r_{\mathrm{mass,cmd},y}$', '$r_{\mathrm{mass},y}$'); ylabel('$r$ (mm)');
+subplot(3,1,3); plot(time, data.r_mass_commanded_2*1000, '--b', time, data.r_mass_2*1000, 'b'); legend('$r_{\mathrm{mass,cmd},z}$', '$r_{\mathrm{mass},z}$'); ylabel('$r$ (mm)');
+xlabel('Time (s)'); sgtitle('$r$ Commanded vs Actual');
+
+% Control inputs
+figure;
+subplot(3,1,1); plot(time, data.u_com_0*1000, 'r'); legend('$u_{\mathrm{com},x}$'); ylabel('$u_{\mathrm{com}}$ (mNm)'); hold on;
+subplot(3,1,2); plot(time, data.u_com_1*1000, 'g'); legend('$u_{\mathrm{com},y}$'); ylabel('$u_{\mathrm{com}}$ (mNm)');
+subplot(3,1,3); plot(time, data.u_com_2*1000, 'b'); legend('$u_{\mathrm{com},z}$'); ylabel('$u_{\mathrm{com}}$ (mNm)');
+xlabel('Time (s)'); sgtitle('$u_{\mathrm{com}}$ (mNm)');
+
+figure;
+subplot(3,1,1); plot(time, data.u_actual_0*1000, 'r'); legend('$u_{\mathrm{actual},x}$'); ylabel('$u_{\mathrm{actual}}$'); hold on;
+subplot(3,1,2); plot(time, data.u_actual_1*1000, 'g'); legend('$u_{\mathrm{actual},y}$'); ylabel('$u_{\mathrm{actual}}$');
+subplot(3,1,3); plot(time, data.u_actual_2*1000, 'b'); legend('$u_{\mathrm{actual},z}$'); ylabel('$u_{\mathrm{actual}}$');
+xlabel('Time (s)'); sgtitle('$u_{\mathrm{actual}}$ (mNm)');
+
+figure;
+subplot(3,1,1); plot(time, data.u_com_0*1000, '--r', time, data.u_actual_0*1000, 'r'); legend('$u_{\mathrm{com},x}$', '$u_{\mathrm{actual},x}$'); ylabel('$u$ (mNm)'); hold on;
+subplot(3,1,2); plot(time, data.u_com_1*1000, '--g', time, data.u_actual_1*1000, 'g'); legend('$u_{\mathrm{com},y}$', '$u_{\mathrm{actual},y}$'); ylabel('$u$ (mNm)');
+subplot(3,1,3); plot(time, data.u_com_2*1000, '--b', time, data.u_actual_2*1000, 'b'); legend('$u_{\mathrm{com},z}$', '$u_{\mathrm{actual},z}$'); ylabel('$u$ (mNm)');
+xlabel('Time (s)'); sgtitle('$u$ Commanded vs Actual (mNm)');
+
+% figure;
+% subplot(3,1,1); plot(time, data.r_mass_commanded_0*1000, 'r'); legend('$r_{\mathrm{mass,cmd},x}$'); ylabel('$r_{\mathrm{mass,cmd}}$ (mm)'); hold on;
+% subplot(3,1,2); plot(time, data.r_mass_commanded_1*1000, 'g'); legend('$r_{\mathrm{mass,cmd},y}$'); ylabel('$r_{\mathrm{mass,cmd}}$ (mm)');
+% subplot(3,1,3); plot(time, data.r_mass_commanded_2*1000, 'b'); legend('$r_{\mathrm{mass,cmd},z}$'); ylabel('$r_{\mathrm{mass,cmd}}$ (mm)');
+% xlabel('Time (s)'); sgtitle('$r_{\mathrm{mass,cmd}}$');
+
+% figure;
+% subplot(3,1,1); plot(time, data.theta_hat_0, 'r'); legend('$\hat{\theta}_x$'); ylabel('${\hat{\theta}}$ (m)'); hold on;
+% subplot(3,1,2); plot(time, data.theta_hat_1, 'g'); legend('$\hat{\theta}_y$'); ylabel('${\hat{\theta}}$ (m)');
+% subplot(3,1,3); plot(time, data.theta_hat_2, 'b'); legend('$\hat{\theta}_z$'); ylabel('${\hat{\theta}}$ (m)');
+% xlabel('Time (s)'); sgtitle('${\hat{\theta}}$ (m)');
+
+
+figure;
+subplot(3,1,1); plot(time, data.u_actual_0*1000, 'r', time, ones(length(time), 1)*u_max(1), 'r--', time, -ones(length(time), 1)*u_max(1), 'r--' ); legend('$u_{\mathrm{actual},x}$'); ylabel('$u_{\mathrm{actual}}$'); hold on;
+subplot(3,1,2); plot(time, data.u_actual_1*1000, 'g', time, ones(length(time), 1)*u_max(2), 'g--', time, -ones(length(time), 1)*u_max(2), 'g--'); legend('$u_{\mathrm{actual},y}$'); ylabel('$u_{\mathrm{actual}}$');
+subplot(3,1,3); plot(time, data.u_actual_2*1000, 'b', time, ones(length(time), 1)*u_max(3), 'b--', time, -ones(length(time), 1)*u_max(3), 'b--'); legend('$u_{\mathrm{actual},z}$'); ylabel('$u_{\mathrm{actual}}$');
+xlabel('Time (s)'); sgtitle('$u_{\mathrm{actual}}$ (mNm) with Max and Min Bounds');

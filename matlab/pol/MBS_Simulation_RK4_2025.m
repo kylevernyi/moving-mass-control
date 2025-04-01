@@ -27,7 +27,7 @@ addpath('Functions/DualQuaternionFunctions');
 
 % Call Global Variables
 global r_com omega_b2i_I_0 q_i2b_0 q_d2b omega_b2d_B omega_d2i_D omega_b2i_I%omega_wo_noise omega_w_noise
-
+global r_error_signal_rec
 % Select Integration Parameters
 integ_period = 400;
 delta_step = 0.01;
@@ -318,6 +318,9 @@ for k = 1:1:3
     end
 end
 
+
+
+
 %% Animation (Uncomment below for 3D animation)
 %%{
 % pause(5)
@@ -384,7 +387,7 @@ function x_dot = mbs_ode_traj(t,u,flag,J0,M,m,g_I,theta,gamma,K,alpha,sigma,A,h)
 
 % Reference Global Variables
 global r_com omega_b2i_I_0 omega_b2d_B omega_d2i_D q_d2b omega_b2i_I %omega_wo_noise omega_w_noise
-
+global r_error_signal_rec
 % Retrieve State Variables
 q_i2b = u(1:4); q_i2b = q_i2b/norm(q_i2b);
 omega_b2i_B = u(5:7);
@@ -443,6 +446,7 @@ omega_b2d_B = omega_b2i_B - omega_d2i_B;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Definition of r
 r = omega_b2d_B + alpha*q_d2b(2:4);
+r_error_signal_rec = [r_error_signal_rec r];
 % Update of J(t) as a function of new mass position
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -483,15 +487,14 @@ u_com = P*cross(omega_b2i_B,J*omega_b2i_B) - P*Phi*theta_hat...
 %det(P*diag(theta_hat.^2))
 
 %u_com = P*u_com;
-u_com_check = quat_mult(quat_mult(q_i2b,[0;u_com]),quat_conj(q_i2b));
+u_com_check = quat_mult(quat_mult(q_i2b,[0;u_com]),quat_conj(q_i2b))
 %u_com_check(4) = 0;
 %u_com = quat_mult(quat_mult(quat_conj(q_i2b),u_com_check),q_i2b);
 %u_com = u_com(2:4);
 % Transformation of u_com to Commanded Positions as in ref[DOI: 10.2514/1.60380]
 r_com = m\(cross(g_B,u_com)/(norm(g_B)^2));
 % Real control applied to the system w/ moving masses
-u = m*(cross(-g_B,r_com));
-u_check = quat_mult(quat_mult(q_i2b,[0;u_com]),quat_conj(q_i2b));
+u = m*(cross(-g_B,r_com))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Define first order ODE's 
 % q_dot of BFF w.r. to Inertial Frame

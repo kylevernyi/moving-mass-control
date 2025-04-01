@@ -155,13 +155,6 @@ for k = 1:1:3
     xlabel('$t (s)$')
     ylabel('$\omega (rad/s)$')
     axis tight;
-    if k == 1
-        ylim([-1 1]*0.6)
-    elseif k == 2
-        ylim([-1 1]*0.5)
-    else
-        ylim([-0.05 0.2])
-    end
 end
 
 % figure; hold on;
