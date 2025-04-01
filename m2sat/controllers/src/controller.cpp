@@ -139,6 +139,7 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
 
     Vector3d r = omega_b2d_B + alpha*q_d2b.vec(); // Definition of r error signal
     std::cout << (alpha*q_d2b.vec()).transpose() << std::endl;
+
     /* Update of J(t) as a function of new mass position */
     Matrix3d Jm_B_dot;
     Jm_B_dot << t.r_mass.y()*t.rdot_mass.y() + t.r_mass.z()*t.rdot_mass.z() , 0 , 0,
@@ -155,8 +156,6 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     Matrix3d Proj_operator = ( Matrix3d::Identity() - (g_B*g_B.transpose()) ) / g_B.squaredNorm();
     controller_output.u_com = Proj_operator * (-Jm_B_dot*(0.5*r - t.omega_b2i_B) + skew(t.omega_b2i_B)*J*t.omega_b2i_B - Phi*theta_hat - K*r ) // -diag((theta_hat).^2)*r
         + Proj_operator*J*(omega_dot_d2i_B + skew(omega_d2i_B)*omega_b2d_B - 0.5*alpha*(skew(q_d2b.vec()) + q_d2b.w()*Matrix3d::Identity())*omega_b2d_B); // desired torque 
-
-
 
     /* Map control Torque to mass positions */
     // Transformation of u_com to Commanded Positions as in ref[DOI: 10.2514/1.60380]
