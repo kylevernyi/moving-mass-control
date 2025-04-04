@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = -DEXTRA -DINTERNAL
 
-CXX_INCLUDES = -I/home/bode/moving-mass-control/m2sat/include -I/home/bode/moving-mass-control/m2sat/build -I/home/bode/moving-mass-control/m2sat/vnproglib/cpp/include -I/home/bode/moving-mass-control/m2sat/cppzmq -I/home/bode/moving-mass-control/m2sat/controllers/include -isystem /usr/include/eigen3
+CXX_INCLUDES = -I/home/bode/moving-mass-control/m2sat/include -I/home/bode/moving-mass-control/m2sat/build -I/home/bode/moving-mass-control/m2sat/vnproglib/cpp/include -I/home/bode/moving-mass-control/m2sat/cppzmq -I/home/bode/moving-mass-control/m2sat/controllers/include -I/home/bode/moving-mass-control/m2sat/build/_deps/json-src/single_include -isystem /usr/include/eigen3
 
 CXX_FLAGS = -O3 -DNDEBUG -std=gnu++17
 

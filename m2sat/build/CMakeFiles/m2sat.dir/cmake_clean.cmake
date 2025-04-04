@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/m2sat.dir/src/imu.cpp.o.d"
   "CMakeFiles/m2sat.dir/src/main.cpp.o"
   "CMakeFiles/m2sat.dir/src/main.cpp.o.d"
+  "CMakeFiles/m2sat.dir/src/motor_mapping.cpp.o"
+  "CMakeFiles/m2sat.dir/src/motor_mapping.cpp.o.d"
   "CMakeFiles/m2sat.dir/src/tic.cpp.o"
   "CMakeFiles/m2sat.dir/src/tic.cpp.o.d"
   "CMakeFiles/m2sat.dir/telemetry.pb.cc.o"

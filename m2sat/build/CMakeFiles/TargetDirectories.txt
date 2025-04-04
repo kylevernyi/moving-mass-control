@@ -85,3 +85,9 @@
 /home/bode/moving-mass-control/m2sat/build/REQUIRED/examples/CMakeFiles/install.dir
 /home/bode/moving-mass-control/m2sat/build/REQUIRED/examples/CMakeFiles/install/local.dir
 /home/bode/moving-mass-control/m2sat/build/REQUIRED/examples/CMakeFiles/install/strip.dir
+/home/bode/moving-mass-control/m2sat/build/_deps/json-build/CMakeFiles/edit_cache.dir
+/home/bode/moving-mass-control/m2sat/build/_deps/json-build/CMakeFiles/rebuild_cache.dir
+/home/bode/moving-mass-control/m2sat/build/_deps/json-build/CMakeFiles/list_install_components.dir
+/home/bode/moving-mass-control/m2sat/build/_deps/json-build/CMakeFiles/install.dir
+/home/bode/moving-mass-control/m2sat/build/_deps/json-build/CMakeFiles/install/local.dir
+/home/bode/moving-mass-control/m2sat/build/_deps/json-build/CMakeFiles/install/strip.dir

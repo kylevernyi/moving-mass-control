@@ -17,6 +17,10 @@ set(CMAKE_MAKEFILE_DEPENDS
   "_deps/catch2-src/extras/Catch.cmake"
   "_deps/catch2-src/src/CMakeLists.txt"
   "_deps/catch2-src/src/catch2/catch_user_config.hpp.in"
+  "_deps/json-src/CMakeLists.txt"
+  "_deps/json-src/cmake/config.cmake.in"
+  "_deps/json-src/cmake/nlohmann_jsonConfigVersion.cmake.in"
+  "_deps/json-src/cmake/pkg-config.pc.in"
   "/home/bode/moving-mass-control/m2sat/controllers/CMakeLists.txt"
   "/home/bode/moving-mass-control/m2sat/cppzmq/CMakeLists.txt"
   "/home/bode/moving-mass-control/m2sat/cppzmq/cmake/DetectCPPZMQVersion.cmake"
@@ -52,6 +56,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-3.25/Modules/Compiler/GNU-CXX.cmake"
   "/usr/share/cmake-3.25/Modules/Compiler/GNU.cmake"
   "/usr/share/cmake-3.25/Modules/DartConfiguration.tcl.in"
+  "/usr/share/cmake-3.25/Modules/ExternalProject.cmake"
   "/usr/share/cmake-3.25/Modules/FetchContent.cmake"
   "/usr/share/cmake-3.25/Modules/FetchContent/CMakeLists.cmake.in"
   "/usr/share/cmake-3.25/Modules/FindGit.cmake"
@@ -86,6 +91,7 @@ set(CMAKE_MAKEFILE_OUTPUTS
 
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
+  "_deps/json-subbuild/CMakeLists.txt"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   "controllers/CMakeFiles/CMakeDirectoryInformation.cmake"
   "libvncxx/CMakeFiles/CMakeDirectoryInformation.cmake"
@@ -101,6 +107,10 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "_deps/catch2-build/generated-includes/catch2/catch_user_config.hpp"
   "_deps/catch2-build/src/CMakeFiles/CMakeDirectoryInformation.cmake"
   "REQUIRED/examples/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "_deps/json-build/nlohmann_json.pc"
+  "_deps/json-build/nlohmann_jsonConfigVersion.cmake"
+  "_deps/json-build/nlohmann_jsonConfig.cmake"
+  "_deps/json-build/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:

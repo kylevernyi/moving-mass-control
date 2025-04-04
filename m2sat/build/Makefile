@@ -716,6 +716,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/m2sat.dir/build.make CMakeFiles/m2sat.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/motor_mapping.o: src/motor_mapping.cpp.o
+.PHONY : src/motor_mapping.o
+
+# target to build an object file
+src/motor_mapping.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/m2sat.dir/build.make CMakeFiles/m2sat.dir/src/motor_mapping.cpp.o
+.PHONY : src/motor_mapping.cpp.o
+
+src/motor_mapping.i: src/motor_mapping.cpp.i
+.PHONY : src/motor_mapping.i
+
+# target to preprocess a source file
+src/motor_mapping.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/m2sat.dir/build.make CMakeFiles/m2sat.dir/src/motor_mapping.cpp.i
+.PHONY : src/motor_mapping.cpp.i
+
+src/motor_mapping.s: src/motor_mapping.cpp.s
+.PHONY : src/motor_mapping.s
+
+# target to generate assembly for a file
+src/motor_mapping.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/m2sat.dir/build.make CMakeFiles/m2sat.dir/src/motor_mapping.cpp.s
+.PHONY : src/motor_mapping.cpp.s
+
 src/tic.o: src/tic.cpp.o
 .PHONY : src/tic.o
 
@@ -845,6 +869,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/motor_mapping.o"
+	@echo "... src/motor_mapping.i"
+	@echo "... src/motor_mapping.s"
 	@echo "... src/tic.o"
 	@echo "... src/tic.i"
 	@echo "... src/tic.s"

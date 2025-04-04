@@ -105,10 +105,24 @@ CMakeFiles/m2sat.dir/src/tic.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/m2sat.dir/src/tic.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/bode/moving-mass-control/m2sat/src/tic.cpp -o CMakeFiles/m2sat.dir/src/tic.cpp.s
 
+CMakeFiles/m2sat.dir/src/motor_mapping.cpp.o: CMakeFiles/m2sat.dir/flags.make
+CMakeFiles/m2sat.dir/src/motor_mapping.cpp.o: /home/bode/moving-mass-control/m2sat/src/motor_mapping.cpp
+CMakeFiles/m2sat.dir/src/motor_mapping.cpp.o: CMakeFiles/m2sat.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/m2sat.dir/src/motor_mapping.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/m2sat.dir/src/motor_mapping.cpp.o -MF CMakeFiles/m2sat.dir/src/motor_mapping.cpp.o.d -o CMakeFiles/m2sat.dir/src/motor_mapping.cpp.o -c /home/bode/moving-mass-control/m2sat/src/motor_mapping.cpp
+
+CMakeFiles/m2sat.dir/src/motor_mapping.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/m2sat.dir/src/motor_mapping.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/bode/moving-mass-control/m2sat/src/motor_mapping.cpp > CMakeFiles/m2sat.dir/src/motor_mapping.cpp.i
+
+CMakeFiles/m2sat.dir/src/motor_mapping.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/m2sat.dir/src/motor_mapping.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/bode/moving-mass-control/m2sat/src/motor_mapping.cpp -o CMakeFiles/m2sat.dir/src/motor_mapping.cpp.s
+
 CMakeFiles/m2sat.dir/src/main.cpp.o: CMakeFiles/m2sat.dir/flags.make
 CMakeFiles/m2sat.dir/src/main.cpp.o: /home/bode/moving-mass-control/m2sat/src/main.cpp
 CMakeFiles/m2sat.dir/src/main.cpp.o: CMakeFiles/m2sat.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/m2sat.dir/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/m2sat.dir/src/main.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/m2sat.dir/src/main.cpp.o -MF CMakeFiles/m2sat.dir/src/main.cpp.o.d -o CMakeFiles/m2sat.dir/src/main.cpp.o -c /home/bode/moving-mass-control/m2sat/src/main.cpp
 
 CMakeFiles/m2sat.dir/src/main.cpp.i: cmake_force
@@ -122,7 +136,7 @@ CMakeFiles/m2sat.dir/src/main.cpp.s: cmake_force
 CMakeFiles/m2sat.dir/telemetry.pb.cc.o: CMakeFiles/m2sat.dir/flags.make
 CMakeFiles/m2sat.dir/telemetry.pb.cc.o: telemetry.pb.cc
 CMakeFiles/m2sat.dir/telemetry.pb.cc.o: CMakeFiles/m2sat.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/m2sat.dir/telemetry.pb.cc.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/m2sat.dir/telemetry.pb.cc.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/m2sat.dir/telemetry.pb.cc.o -MF CMakeFiles/m2sat.dir/telemetry.pb.cc.o.d -o CMakeFiles/m2sat.dir/telemetry.pb.cc.o -c /home/bode/moving-mass-control/m2sat/build/telemetry.pb.cc
 
 CMakeFiles/m2sat.dir/telemetry.pb.cc.i: cmake_force
@@ -137,6 +151,7 @@ CMakeFiles/m2sat.dir/telemetry.pb.cc.s: cmake_force
 m2sat_OBJECTS = \
 "CMakeFiles/m2sat.dir/src/imu.cpp.o" \
 "CMakeFiles/m2sat.dir/src/tic.cpp.o" \
+"CMakeFiles/m2sat.dir/src/motor_mapping.cpp.o" \
 "CMakeFiles/m2sat.dir/src/main.cpp.o" \
 "CMakeFiles/m2sat.dir/telemetry.pb.cc.o"
 
@@ -145,6 +160,7 @@ m2sat_EXTERNAL_OBJECTS =
 
 m2sat: CMakeFiles/m2sat.dir/src/imu.cpp.o
 m2sat: CMakeFiles/m2sat.dir/src/tic.cpp.o
+m2sat: CMakeFiles/m2sat.dir/src/motor_mapping.cpp.o
 m2sat: CMakeFiles/m2sat.dir/src/main.cpp.o
 m2sat: CMakeFiles/m2sat.dir/telemetry.pb.cc.o
 m2sat: CMakeFiles/m2sat.dir/build.make
@@ -152,7 +168,7 @@ m2sat: controllers/libcontrollers.a
 m2sat: /usr/lib/aarch64-linux-gnu/libprotobuf.so
 m2sat: libvncxx/liblibvncxx.a
 m2sat: CMakeFiles/m2sat.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable m2sat"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/bode/moving-mass-control/m2sat/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable m2sat"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/m2sat.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
