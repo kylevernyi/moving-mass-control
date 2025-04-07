@@ -47,6 +47,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/home/bode/moving-mass-control/m2sat/build/controllers/cmake_install.cmake")
   include("/home/bode/moving-mass-control/m2sat/build/libvncxx/cmake_install.cmake")
   include("/home/bode/moving-mass-control/m2sat/build/REQUIRED/cmake_install.cmake")
+  include("/home/bode/moving-mass-control/m2sat/build/_deps/json-build/cmake_install.cmake")
 
 endif()
 

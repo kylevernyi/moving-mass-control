@@ -173,6 +173,24 @@ int tic_set_max_accel(int fd, uint8_t address, int32_t max_accel)
         return -1;
     }
     return 0;
+}
+
+int tic_set_max_deccel(int fd, uint8_t address, int32_t max_deccel)
+{
+    uint8_t command[] = {
+        ADDR_SET_MAX_DECELL,
+        (uint8_t)(max_deccel >> 0 & 0xFF),
+        (uint8_t)(max_deccel >> 8 & 0xFF),
+        (uint8_t)(max_deccel >> 16 & 0xFF),
+        (uint8_t)(max_deccel >> 24 & 0xFF),
+    };
+    struct i2c_msg message = { address, 0, sizeof(command), command };
+    struct i2c_rdwr_ioctl_data ioctl_data = { &message, 1 };
+    int result = ioctl(fd, I2C_RDWR, &ioctl_data);
+    if (result != 1) {
+        perror("failed to set max decell");
+        return -1;
+    }
     return 0;
 }
 
@@ -208,6 +226,21 @@ int tic_set_step_mode(int fd, uint8_t address, uint8_t step_mode)
     return 0;
 }
 
+int tic_set_reverse_mode(int fd, uint8_t address)
+{
+    uint8_t command[] = {
+        ADDR_SET_REVERSE_MODE,
+        128
+    };
+    struct i2c_msg message = { address, 0, sizeof(command), command };
+    struct i2c_rdwr_ioctl_data ioctl_data = { &message, 1 };
+    int result = ioctl(fd, I2C_RDWR, &ioctl_data);
+    if (result != 1) {
+        perror("failed to set reverse mode");
+        return -1;
+    }
+    return 0;
+}
 
 int tic_deenergize(int fd, uint8_t address)
 {
@@ -225,11 +258,11 @@ int tic_deenergize(int fd, uint8_t address)
 }
 
 
-int tic_go_home(int fd, uint8_t address)
+int tic_go_home(int fd, uint8_t address, uint8_t direction) // 0 = reverse 1 = forward
 {
     uint8_t command[] = {
         ADDR_GO_HOME,
-        (uint8_t) 0
+        direction
     };
     struct i2c_msg message = { address, 0, sizeof(command), command };
     struct i2c_rdwr_ioctl_data ioctl_data = { &message, 1 };
@@ -260,10 +293,16 @@ int SetTicSettings(int fd, uint8_t address)
     tic_deenergize(fd, address);
     tic_set_current_limit(fd, address, mapCurrentLimit(TIC_CURRENT_LIMIT_MILLIAMPS));
     tic_set_max_accel(fd, address, STEPPER_MAX_ACCEL_PPS2*PPS2_UNIT_CONVERSION);
+    tic_set_max_deccel(fd, address, STEPPER_MAX_DECELL_PPS2*PPS2_UNIT_CONVERSION);
     tic_set_max_speed(fd, address, STEPPER_MAX_PULSES_PER_SEC*PPS_UNIT_CONVERSION);
     tic_set_starting_speed(fd,address, STEPPER_START_SPEED_PPS*PPS_UNIT_CONVERSION);
     tic_set_step_mode(fd, address, STEPPER_STEP_MODE);
-    tic_go_home(fd, address);
+    
+    if (address != 102) {    
+        tic_go_home(fd, address, 0);
+    } else {
+        tic_go_home(fd, address, 1);
+    }
 
     misc_flags_1_t flags;
     flags = tic_get_misc_flags(fd, address);

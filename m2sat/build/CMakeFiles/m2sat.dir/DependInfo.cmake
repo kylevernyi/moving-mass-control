@@ -10,6 +10,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/bode/moving-mass-control/m2sat/src/imu.cpp" "CMakeFiles/m2sat.dir/src/imu.cpp.o" "gcc" "CMakeFiles/m2sat.dir/src/imu.cpp.o.d"
   "/home/bode/moving-mass-control/m2sat/src/main.cpp" "CMakeFiles/m2sat.dir/src/main.cpp.o" "gcc" "CMakeFiles/m2sat.dir/src/main.cpp.o.d"
+  "/home/bode/moving-mass-control/m2sat/src/motor_mapping.cpp" "CMakeFiles/m2sat.dir/src/motor_mapping.cpp.o" "gcc" "CMakeFiles/m2sat.dir/src/motor_mapping.cpp.o.d"
   "/home/bode/moving-mass-control/m2sat/src/tic.cpp" "CMakeFiles/m2sat.dir/src/tic.cpp.o" "gcc" "CMakeFiles/m2sat.dir/src/tic.cpp.o.d"
   "/home/bode/moving-mass-control/m2sat/build/telemetry.pb.cc" "CMakeFiles/m2sat.dir/telemetry.pb.cc.o" "gcc" "CMakeFiles/m2sat.dir/telemetry.pb.cc.o.d"
   )

@@ -4,7 +4,7 @@
 #include <chrono>
 #include <iostream> 
 
-#define TELEMETRY_SEND_RATE_HZ (40) 
+#define TELEMETRY_SEND_RATE_HZ (60) 
 using namespace Eigen;
 typedef Vector<double, 6> Vector6d;
 
@@ -29,19 +29,19 @@ struct telemetry_t
 
     void Disp() {
     std::cout << "Time: " << time << " ms" << std::endl;
-    std::cout << "q_b2i (Quaternion from body to inertial): "
-              << q_b2i.coeffs().transpose() << std::endl;
-    std::cout << "q_i2d (Quaternion from inertial to desired): "
-              << q_i2d.coeffs().transpose() << std::endl;
-    std::cout << "omega_b2i_B (Angular velocity of b2i in body frame): "
-              << omega_b2i_B.transpose() << std::endl;
+    // std::cout << "q_b2i (Quaternion from body to inertial): "
+            //   << q_b2i.coeffs().transpose() << std::endl;
+    // std::cout << "q_i2d (Quaternion from inertial to desired): "
+            //   << q_i2d.coeffs().transpose() << std::endl;
+    // std::cout << "omega_b2i_B (Angular velocity of b2i in body frame): "
+            //   << omega_b2i_B.transpose() << std::endl;
     std::cout << "r_mass (Mass position): " << r_mass.transpose() << std::endl;
-    std::cout << "rdot_mass (Mass velocity): " << rdot_mass.transpose() << std::endl;
+    // std::cout << "rdot_mass (Mass velocity): " << rdot_mass.transpose() << std::endl;
     std::cout << "r_mass_commanded (Commanded mass position): "
               << r_mass_commanded.transpose() << std::endl;
     std::cout << "u_com (Commanded torque): " << u_com.transpose() << std::endl;
     std::cout << "u_actual (Actual control torque): " << u_actual.transpose() << std::endl;
-    std::cout << "theta_hat (Estimated offset): " << theta_hat.transpose() << std::endl;
+    // std::cout << "theta_hat (Estimated offset): " << theta_hat.transpose() << std::endl;
     std::cout << "+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n";
 }
 };

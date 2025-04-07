@@ -15,11 +15,12 @@
 #define RAD_TO_REV (1/(2*M_PI))
 
 /* Stepper max rates */
-#define STEPPER_MAX_RAD_PER_SEC (20.0f) // just over 1 rev per second
+#define STEPPER_MAX_RAD_PER_SEC (1000.0f) 
 #define STEPPER_MAX_PULSES_PER_SEC (STEPPER_MAX_RAD_PER_SEC * RAD_TO_REV * STEPPER_STEPS_PER_REV * STEPPER_STEP_MODE_NUMERIC)
-#define STEPPER_START_SPEED_PPS (200.0f) // speed the motor tries to start at, if too high, it stalls
-#define STEPPER_MAX_ACCEL_PPS2 (1000.0f)    // pulses per second squared, if we go higher, we need more current but we are already current limiting
-#define TIC_CURRENT_LIMIT_MILLIAMPS (1400)
+#define STEPPER_START_SPEED_PPS (5.0f) // speed the motor tries to start at, if too high, it stalls
+#define STEPPER_MAX_ACCEL_PPS2 (60000.0f)    // pulses per second squared, if we go higher, we need more current but we are already current limiting
+#define STEPPER_MAX_DECELL_PPS2 (40000.0f)
+#define TIC_CURRENT_LIMIT_MILLIAMPS (1800)
 #define STEPPER_STEP_MODE_NUMERIC (2.0f) // 2 half step, 4 quater etc
 #define STEPPER_STEP_MODE (1) 
 /* per the stepper_step_mode documentation from polulu
@@ -54,8 +55,9 @@
 #define ADDR_SET_MAX_SPEED (0xE6)
 #define ADDR_SET_STARTING_SPEED (0xE5)
 #define ADDR_SET_MAX_ACCEL (0xEA)
+#define ADDR_SET_MAX_DECELL (0xE9)
 #define ADDR_SET_STEP_MODE (0x94)
-
+#define ADDR_SET_REVERSE_MODE (0x1B)
 
 // Use #pragma pack to ensure the compiler doesn't add extra padding:
 #pragma pack(push, 1)
@@ -82,15 +84,18 @@ extern "C"
     int open_i2c_device(const char * device);
     int tic_exit_safe_start(int fd, uint8_t address);
     int tic_deenergize(int fd, uint8_t address);
-    int tic_go_home(int fd, uint8_t address);
+    int tic_go_home(int fd, uint8_t address, uint8_t direction);
 
     int tic_set_target_position(int fd, uint8_t address, int32_t target);
     
     int tic_set_max_speed(int fd, uint8_t address, int32_t max_speed);
     int tic_set_starting_speed(int fd, uint8_t address, int32_t starting_speed);
     int tic_set_max_accel(int fd, uint8_t address, int32_t max_accel);
+    int tic_set_max_deccel(int fd, uint8_t address, int32_t max_deccel);
     int tic_set_current_limit(int fd, uint8_t address, uint8_t current_limit);
     int tic_set_step_mode(int fd, uint8_t address, uint8_t step_mode);
+    int tic_set_reverse_mode(int fd, uint8_t address);
+
 
     int tic_get_variable(int fd, uint8_t address, uint8_t offset, uint8_t * buffer, uint8_t length);
     int tic_get_current_position(int fd, uint8_t address, int32_t * output);
