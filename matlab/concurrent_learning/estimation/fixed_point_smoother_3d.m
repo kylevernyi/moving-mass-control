@@ -77,7 +77,7 @@ for i = 1:length(t)-1
             % Sigma(:,:,k+1) = 0.5 * (Sigma(:,:,k+1) + Sigma(:,:,k+1)');
             % Pi(:,:,k+1) = 0.5 * (Pi(:,:,k+1) + Pi(:,:,k+1)');
 
-                xhat_original(:,k+1) =  xhat(:,k+1); % save for comparison
+            xhat_original(:,k+1) =  xhat(:,k+1); % save for comparison
 
         end
     end
