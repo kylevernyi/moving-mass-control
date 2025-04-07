@@ -6,17 +6,21 @@
 #include <cstdlib>
 #include <termios.h>
 #include <unistd.h>
+#include <nlohmann/json.hpp>
+#include <fstream>
 
 #include "controller.h"
 #include "telemetry_conversion.h"
+#include "motor_mapping.h"
 #include "ClockManager.h"
 #include "kalman.h"
 #include "imu.h"
 #include "tic.h"
 
-#define MAIN_LOOP_RATE_HZ (200)
-#define ACTUATION_RATE_HZ (100)
+#define MAIN_LOOP_RATE_HZ (1000)
+#define ACTUATION_RATE_HZ (200)
 
+void LoadGainsFromJSON();
 uint64_t getTimestamp();
 void signalHandler(int signum);
 void waitForKeyPress();
@@ -60,11 +64,13 @@ int main()
     /* Groundstation communication */
     telemetry_socket.bind("tcp://*:5555");  // Bind to TCP port 5555
 
+    /* Data structure for telemetry */
     telemetry_t tele; // default initilziation to zeros already no need for memset zeros
-    // tele.q_i2d.w() = 0; tele.q_i2d.x() = 0; tele.q_i2d.y() = 0; tele.q_i2d.z() = 1;  // desired quaternion iniialization
     tele.r_mass << 0,0,0; // masses start at origin
 
-    telemetry_t controller_output; 
+
+    /* Load gains for controller from JSON*/
+    LoadGainsFromJSON();
 
     /* Start TIC communication */
     stepper_i2c_fd = open_i2c_device(TIC_I2C_ADDRESS_DEVICE);
@@ -73,16 +79,19 @@ int main()
         std::cout << "Could not connect to i2c bus!!!" << std::endl;
     } else // configure the tics
     {
+        // tic_set_reverse_mode(stepper_i2c_fd, 102);
         for (auto iter = tic_id.begin(); iter != tic_id.end(); iter++)
         {
             SetTicSettings(stepper_i2c_fd, *iter); 
         } 
     }
+    
     waitForKeyPress(); // manual starting of the experiment. steppers are sent to the origin and held there
     tare_heading(); // zero heading angle
 
     exp_start_time = getTimestamp(); 
 
+    /* Set inertia and initial estimate values for controller, can do other things in here for controller if desired */
     InitController();
 
     while (true) {
@@ -115,15 +124,18 @@ int main()
         auto check_controller_clock = clockManager.Elapsed("controller");        
         if (check_controller_clock.first && (imu_data.valid_data == true)) // if sufficient time elapsed and we have imu data
         {
-            controller_output = Controller(tele, check_controller_clock.second.count());
-            controller_output.time = getTimestamp() - exp_start_time;
+            tele = Controller(tele, check_controller_clock.second.count());
+            // tele = PD_Controller(tele,  check_controller_clock.second.count());
+            
+
+            tele.time = getTimestamp() - exp_start_time;
         }
 
         /* Actuate motors */
         if (clockManager.Elapsed("actuation").first)
         {
             std::vector<int32_t> motor_shaft_position_pulses = ConvertMassPositionToMotorPosition(
-                controller_output.r_mass_commanded.x(), controller_output.r_mass_commanded.y(), controller_output.r_mass_commanded.z());
+                tele.r_mass_commanded.x(), tele.r_mass_commanded.y(),  tele.r_mass_commanded.z());
             // Send motor position commands to motors
             for (uint8_t i = 0; i<3; i++) 
             {
@@ -136,13 +148,13 @@ int main()
         if (clockManager.Elapsed("telemetry").first) 
         {
             // Create and populate a telemetry message
-            TelemetryMessage msg = toProto(controller_output); // Convert to Protobuf        
+            TelemetryMessage msg = toProto(tele); // Convert to Protobuf        
             // Serialize to string
             std::string serialized_msg;
             msg.SerializeToString(&serialized_msg);
             zmq::message_t zmq_msg(serialized_msg.data(), serialized_msg.size());
             telemetry_socket.send(zmq_msg, zmq::send_flags::none);
-            // controller_output.Disp();
+            tele.Disp();
         }
         
         /* Loop timing business */
@@ -167,8 +179,28 @@ void signalHandler(int signum) {
     std::exit(signum);
 }
 
+Matrix3d loadMatrix(const nlohmann::json& j) {
+    Matrix3d mat;
+    for (int i = 0; i < 3; ++i) {
+        for (int k = 0; k < 3; ++k) {  // Use `k` instead of `j` to avoid confusion
+            mat(i, k) = j[i][k].get<double>();  // Correct indexing
+        }
+    }
+    return mat;
+}
 
-uint64_t getTimestamp() {
+void LoadGainsFromJSON()
+{
+    ifstream file("/home/bode/moving-mass-control/m2sat/gains.json");
+    nlohmann::json j;
+    file >> j;
+    SetGains(loadMatrix(j["K_1"]), loadMatrix(j["K_2"]), loadMatrix(j["K_3"]), loadMatrix(j["K_4"]), 
+        loadMatrix(j["alpha_1"]), loadMatrix(j["alpha_2"]),
+        loadMatrix(j["gamma_gain"]), loadMatrix(j["CL_gain"]), loadMatrix(j["adaptive_gain"]));
+}
+
+uint64_t getTimestamp()
+{
     // Get the current time point from the system clock
     auto now = std::chrono::system_clock::now();
     // Convert the time point to a duration since epoch

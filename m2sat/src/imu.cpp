@@ -31,11 +31,23 @@ void ConnectAndConfigureIMU(imu_data_vn_format_t * imu_data, std::mutex * imu_mu
 
     /* Tell IMU it is rotated 90 degrees about the y axis of the body */
     // The IMU needs UNPLUGGED and REPLUGGED if this matrix changes to apply the change
-    const vn::math::mat3f rotationMatrix(
+    vn::math::mat3f R_imu2body_y(
         0.0,  0.0f,  -1.0f, 
 		0.0f, 1.0f,  0.0f, 
 		1.0f,  0.0f, 0.0f);
-	vs.writeReferenceFrameRotation(rotationMatrix, true);
+    vn::math::mat3f R_imu2body_z(
+        0.0f,  -1.0f,   0.0f,
+        1.0f,   0.0f,   0.0f,
+        0.0f,   0.0f,   1.0f);
+    
+    vn::math::mat3f R_body2principal(
+        0.964273155673016,  -0.264591257791476,   0.012990286706965,
+        0.264876543734282,   0.963770388740287,  -0.031417421389680,
+       -0.004206878627359,   0.033735798311594,   0.999421931960918);
+
+    // const vn::math::mat3f R_imu2principal = R_body2principal * (R_imu2body_z * R_imu2body_y);
+
+	vs.writeReferenceFrameRotation(R_imu2body_y, true);
 	vs.writeSettings(true); 
 
     /* Indoor mode for heading */

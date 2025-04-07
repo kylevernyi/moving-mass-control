@@ -10,7 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(sources 
     src/imu.cpp 
-    src/tic.cpp   
+    src/tic.cpp
+    src/motor_mapping.cpp   
     src/main.cpp)
 
 # Add module subdirectories
@@ -41,9 +42,18 @@ include_directories(include ${EIGEN3_INCLUDE_DIRS} ${Protobuf_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/vnproglib/cpp/include
     cppzmq)
 
+include(FetchContent)
+FetchContent_Declare(json
+  GIT_REPOSITORY https://github.com/ArthurSonzogni/nlohmann_json_cmake_fetchcontent
+  GIT_PROGRESS TRUE  GIT_SHALLOW TRUE
+  GIT_TAG v3.11.2)
+
+FetchContent_MakeAvailable(json)
+
+
     # Add the executable
 add_executable(m2sat ${sources} ${PROTO_SRCS} ${PROTO_HDRS})
 add_executable(tare_imu tare_imu/main.cpp)
 
-target_link_libraries(m2sat PRIVATE controllers Eigen3::Eigen protobuf::libprotobuf libvncxx zmq)
+target_link_libraries(m2sat PRIVATE controllers Eigen3::Eigen protobuf::libprotobuf libvncxx zmq nlohmann_json::nlohmann_json)
 target_link_libraries(tare_imu PRIVATE libvncxx)

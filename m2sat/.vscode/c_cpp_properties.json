@@ -20,7 +20,8 @@
                 "${workspaceFolder}/**",
                 "/usr/include/eigen3/**",
                 "${workspaceFolder}/vnproglib/cpp/**",
-                "${workspaceFolder}/cppzmq"
+                "${workspaceFolder}/cppzmq",
+                "${workspaceFolder}/build/_deps/json-src/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/aarch64-linux-gnu-g++",
@@ -28,7 +29,7 @@
             "cppStandard": "c++17",
             "intelliSenseMode": "linux-gcc-arm",
             "forcedInclude": [
-            "${workspaceFolder}/.vscode/eigen_fix.h"
+                "${workspaceFolder}/.vscode/eigen_fix.h"
             ]
         }
     ],
