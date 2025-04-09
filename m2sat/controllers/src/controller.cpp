@@ -103,6 +103,28 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     // Transformation Rotation of Angular Rates of the DF w.r. to Inertial from Inertial to DF
     Vector3d omega_d2i_D = quat_rotate(t.q_i2d.conjugate(), omega_d2i_I); //  quat_mult(quat_mult(quat_conj(q_i2d),[0;omega_d2i_I]),q_i2d);
 
+    /* Trajectory Design */
+    static const double T_trans = 30.0f;
+    static const double rot_trans = M_PI/9.0f;
+    if (t.time*1e-3 < T_trans + 50)
+    {
+        Vector3d added_desired_term; added_desired_term <<  0, 
+        rot_trans*M_PI/(2*T_trans)*sin(M_PI/T_trans*(t.time*1e-3 -50)),
+        0;
+        omega_d2i_D = omega_d2i_D + added_desired_term;
+    }
+    else if (t.time*1e-3 < T_trans + 300)
+    {
+        Vector3d added_desired_term;  added_desired_term << 0,
+            -rot_trans*M_PI/(2*T_trans)*sin(M_PI/T_trans*(t.time*1e-3 -300)), 
+            0;
+        omega_d2i_D = omega_d2i_D + added_desired_term;
+    }
+    
+
+    
+    
+    
     Vector3d omega_dot_d2i_D = (Vector3d() << 0,0,0).finished(); //0; 0*A*exp(-f*t)*(f*sin(b*t) - b*cos(b*t));0];
     Vector3d omega_dot_d2i_I = quat_rotate(q_i2b, omega_dot_d2i_D); // quat_mult(quat_mult(q_i2d,[0;omega_dot_d2i_D]),quat_conj(q_i2d));
     Vector3d omega_dot_d2i_B = quat_rotate(q_i2b.conjugate(), omega_dot_d2i_I); // quat_mult(quat_mult(quat_conj(q_i2b),[0;omega_dot_d2i_I]),q_i2b);
@@ -151,61 +173,7 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     controller_output.r_mass_commanded = SaturationLimit(controller_output.r_mass_commanded);
 
 
-    /* Concurrent learning data selection algorithm */
-    static int p_CL_idx = 0;
-    if (t.nu.size() > CL_turn_on) // make sure we have state estimate
-    {
-        // initialization done once
-        static Vector<double, 9> Phi_previous = Phi.reshaped(9, 1);
-        static int current_index_for_cyclic_stack = p_CL_idx;
-
-        // extract states
-        Vector3d omega_hat = t.nu.back().segment(0,3);
-        Vector3d omega_dot_hat = t.nu.back().segment(3,3);
-
-        // append Phi to a new stack to check if rank changes
-        MatrixXd Phi_new_stack = Phi_stack; // [Phi_stack, Phi(:)];
-        Phi_new_stack.conservativeResize(Eigen::NoChange, Phi_new_stack.cols() + 1);
-        Phi_new_stack.col(Phi_new_stack.cols() - 1) = Phi.reshaped(9,1); // added new col, set new col equal to Phi(:)
-        
-        // Point selection criteria
-        if ( ( (Phi.reshaped(9,1)- Phi_previous).squaredNorm()  >= CL_point_accept_epsilon)  || (rank(Phi_new_stack) > rank(Phi_stack)) )
-        {
-            Vector3d Tau_j; // = J*omega_dot_hat(:,w_iter) +  cross(omega_hat(:,w_iter),J*omega_hat(:,w_iter)) - u_com(:,w_iter);
-
-            if (p_CL_idx < p_bar) // record more data until p_bar points
-            {
-                p_CL_idx = p_CL_idx+1;
-                current_index_for_cyclic_stack = p_CL_idx;
-                Phi_stack = Phi_new_stack; 
-                Phi_previous = Phi.reshaped(9,1);
-
-                Tau_stack.conservativeResize(Eigen::NoChange, p_CL_idx);
-                Tau_stack.col(Tau_stack.cols() - 1) = Tau_j; // insert tau into stack
-            }
-            else
-            {
-                // cyclic history stack
-                Phi_stack.col(current_index_for_cyclic_stack) = Phi.reshaped(9,1); // Insert the new element at the current index
-                Tau_stack.col(current_index_for_cyclic_stack) = Tau_j; // Insert the new element at the current index
-                current_index_for_cyclic_stack = (current_index_for_cyclic_stack % p_bar) + 1;
-            }
-            // point_added = [point_added t]; %  record that we stored a point
-        }
-    }
-
-    /* Concurrent learning error signal */
-    Vector3d concurrent_learning_Tau_ext; concurrent_learning_Tau_ext << 0,0,0;
-
-        for (int j=1; j<= p_CL_idx; j++)
-        {
-            Vector3d Tau_j = Tau_stack.col(j); // jth delta from storage
-            Matrix3d Phi_j = Phi_stack.col(j).reshaped(3,3); // jth phi matrix from storage
-            Vector3d epsilon_Tau_ext = Phi_j*t.theta_hat - Tau_j;
-            concurrent_learning_Tau_ext += Phi_j*epsilon_Tau_ext;  
-        }
-
-
+    
     /* Dynamics for desired frame */
     Quaterniond omega_d2i_D_quaternion; 
     omega_d2i_D_quaternion.w() = 0; 
@@ -215,15 +183,10 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     q_i2d_dot.coeffs() *= 0.5; // dont forget to scale by 0.5 since we cant do that above due to * operator override
     controller_output.q_i2d.coeffs() += q_i2d_dot.coeffs()*dt_seconds; 
     controller_output.q_i2d.normalize();
-    
-    std::cout << "q_i2d_dot: " << q_i2d_dot.coeffs().transpose() << std::endl;
-    std::cout << "q_i2d: " << t.q_i2d.coeffs().transpose() << std::endl;
-    std::cout << "q_i2d normalized: " << t.q_i2d.coeffs().transpose() << std::endl;
-
 
     /* Update law */
-    Vector3d theta_hat_dot = gamma_gain * ( (Phi.transpose()*r)  + CL_on*CL_gain*concurrent_learning_Tau_ext); //  Adaptive update law
-    std::cout << "hat dot" << theta_hat_dot.transpose() << std::endl;
+    Vector3d theta_hat_dot = gamma_gain * (Phi.transpose()*r) ; //+ CL_on*CL_gain*concurrent_learning_Tau_ext); //  Adaptive update law
+    // std::cout << "hat dot" << theta_hat_dot.transpose() << std::endl;
     controller_output.theta_hat += theta_hat_dot*dt_seconds; 
 
     /* Compute our actual control torque at the moment for logging */
@@ -321,3 +284,56 @@ int rank(MatrixXd mat)
     return rank_;
 }
 
+// /* Concurrent learning data selection algorithm */
+// static int p_CL_idx = 0;
+// if (t.nu.size() > CL_turn_on) // make sure we have state estimate
+// {
+//     // initialization done once
+//     static Vector<double, 9> Phi_previous = Phi.reshaped(9, 1);
+//     static int current_index_for_cyclic_stack = p_CL_idx;
+
+//     // extract states
+//     Vector3d omega_hat = t.nu.back().segment(0,3);
+//     Vector3d omega_dot_hat = t.nu.back().segment(3,3);
+
+//     // append Phi to a new stack to check if rank changes
+//     MatrixXd Phi_new_stack = Phi_stack; // [Phi_stack, Phi(:)];
+//     Phi_new_stack.conservativeResize(Eigen::NoChange, Phi_new_stack.cols() + 1);
+//     Phi_new_stack.col(Phi_new_stack.cols() - 1) = Phi.reshaped(9,1); // added new col, set new col equal to Phi(:)
+    
+//     // Point selection criteria
+//     if ( ( (Phi.reshaped(9,1)- Phi_previous).squaredNorm()  >= CL_point_accept_epsilon)  || (rank(Phi_new_stack) > rank(Phi_stack)) )
+//     {
+//         Vector3d Tau_j; // = J*omega_dot_hat(:,w_iter) +  cross(omega_hat(:,w_iter),J*omega_hat(:,w_iter)) - u_com(:,w_iter);
+
+//         if (p_CL_idx < p_bar) // record more data until p_bar points
+//         {
+//             p_CL_idx = p_CL_idx+1;
+//             current_index_for_cyclic_stack = p_CL_idx;
+//             Phi_stack = Phi_new_stack; 
+//             Phi_previous = Phi.reshaped(9,1);
+
+//             Tau_stack.conservativeResize(Eigen::NoChange, p_CL_idx);
+//             Tau_stack.col(Tau_stack.cols() - 1) = Tau_j; // insert tau into stack
+//         }
+//         else
+//         {
+//             // cyclic history stack
+//             Phi_stack.col(current_index_for_cyclic_stack) = Phi.reshaped(9,1); // Insert the new element at the current index
+//             Tau_stack.col(current_index_for_cyclic_stack) = Tau_j; // Insert the new element at the current index
+//             current_index_for_cyclic_stack = (current_index_for_cyclic_stack % p_bar) + 1;
+//         }
+//         // point_added = [point_added t]; %  record that we stored a point
+//     }
+// }
+
+// /* Concurrent learning error signal */
+// Vector3d concurrent_learning_Tau_ext; concurrent_learning_Tau_ext << 0,0,0;
+
+//     for (int j=1; j<= p_CL_idx; j++)
+//     {
+//         Vector3d Tau_j = Tau_stack.col(j); // jth delta from storage
+//         Matrix3d Phi_j = Phi_stack.col(j).reshaped(3,3); // jth phi matrix from storage
+//         Vector3d epsilon_Tau_ext = Phi_j*t.theta_hat - Tau_j;
+//         concurrent_learning_Tau_ext += Phi_j*epsilon_Tau_ext;  
+//     }

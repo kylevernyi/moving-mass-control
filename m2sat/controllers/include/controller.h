@@ -11,7 +11,7 @@
 #include "kalman.h"
 #include "telemetry.h"
 
-#define CONTROLLER_RATE_HZ (200)
+#define CONTROLLER_RATE_HZ (200.0f)
 
 static const int CL_turn_on = 10; // wait until this many points are in nu to turn on CL
 

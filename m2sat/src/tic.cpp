@@ -110,7 +110,9 @@ int tic_get_current_velocity(int fd, uint8_t address, int32_t * output)
 {
     *output = 0;
     uint8_t buffer[4];
+    
     int result = tic_get_variable(fd, address, ADDR_CURRENT_VELOCITY, buffer, sizeof(buffer));
+    
     if (result) { return -1; }
     *output = buffer[0] + ((uint32_t)buffer[1] << 8) +
     ((uint32_t)buffer[2] << 16) + ((uint32_t)buffer[3] << 24);

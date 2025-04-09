@@ -33,6 +33,7 @@ PROTOBUF_CONSTEXPR TelemetryMessage::TelemetryMessage(
   , /*decltype(_impl_.nu_top_)*/{}
   , /*decltype(_impl_.nu_bottom_)*/{}
   , /*decltype(_impl_.theta_hat_)*/{}
+  , /*decltype(_impl_.omega_d2i_d_)*/{}
   , /*decltype(_impl_.time_)*/uint64_t{0u}
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct TelemetryMessageDefaultTypeInternal {
@@ -67,6 +68,7 @@ const uint32_t TableStruct_telemetry_2eproto::offsets[] PROTOBUF_SECTION_VARIABL
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.nu_top_),
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.nu_bottom_),
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.theta_hat_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.omega_d2i_d_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::TelemetryMessage)},
@@ -77,18 +79,19 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_telemetry_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\017telemetry.proto\"\221\002\n\020TelemetryMessage\022\014"
+  "\n\017telemetry.proto\"\252\002\n\020TelemetryMessage\022\014"
   "\n\004time\030\001 \001(\004\022\025\n\tomega_b2i\030\002 \003(\001B\002\020\001\022\021\n\005q"
   "_b2i\030\003 \003(\001B\002\020\001\022\021\n\005q_i2d\030\004 \003(\001B\002\020\001\022\022\n\006r_m"
   "ass\030\005 \003(\001B\002\020\001\022\025\n\trdot_mass\030\006 \003(\001B\002\020\001\022\034\n\020"
   "r_mass_commanded\030\007 \003(\001B\002\020\001\022\021\n\005u_com\030\010 \003("
   "\001B\002\020\001\022\024\n\010u_actual\030\t \003(\001B\002\020\001\022\022\n\006nu_top\030\n "
   "\003(\001B\002\020\001\022\025\n\tnu_bottom\030\013 \003(\001B\002\020\001\022\025\n\ttheta_"
-  "hat\030\014 \003(\001B\002\020\001b\006proto3"
+  "hat\030\014 \003(\001B\002\020\001\022\027\n\013omega_d2i_D\030\r \003(\001B\002\020\001b\006"
+  "proto3"
   ;
 static ::_pbi::once_flag descriptor_table_telemetry_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_telemetry_2eproto = {
-    false, false, 301, descriptor_table_protodef_telemetry_2eproto,
+    false, false, 326, descriptor_table_protodef_telemetry_2eproto,
     "telemetry.proto",
     &descriptor_table_telemetry_2eproto_once, nullptr, 0, 1,
     schemas, file_default_instances, TableStruct_telemetry_2eproto::offsets,
@@ -129,6 +132,7 @@ TelemetryMessage::TelemetryMessage(const TelemetryMessage& from)
     , decltype(_impl_.nu_top_){from._impl_.nu_top_}
     , decltype(_impl_.nu_bottom_){from._impl_.nu_bottom_}
     , decltype(_impl_.theta_hat_){from._impl_.theta_hat_}
+    , decltype(_impl_.omega_d2i_d_){from._impl_.omega_d2i_d_}
     , decltype(_impl_.time_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
@@ -153,6 +157,7 @@ inline void TelemetryMessage::SharedCtor(
     , decltype(_impl_.nu_top_){arena}
     , decltype(_impl_.nu_bottom_){arena}
     , decltype(_impl_.theta_hat_){arena}
+    , decltype(_impl_.omega_d2i_d_){arena}
     , decltype(_impl_.time_){uint64_t{0u}}
     , /*decltype(_impl_._cached_size_)*/{}
   };
@@ -180,6 +185,7 @@ inline void TelemetryMessage::SharedDtor() {
   _impl_.nu_top_.~RepeatedField();
   _impl_.nu_bottom_.~RepeatedField();
   _impl_.theta_hat_.~RepeatedField();
+  _impl_.omega_d2i_d_.~RepeatedField();
 }
 
 void TelemetryMessage::SetCachedSize(int size) const {
@@ -203,6 +209,7 @@ void TelemetryMessage::Clear() {
   _impl_.nu_top_.Clear();
   _impl_.nu_bottom_.Clear();
   _impl_.theta_hat_.Clear();
+  _impl_.omega_d2i_d_.Clear();
   _impl_.time_ = uint64_t{0u};
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
@@ -342,6 +349,17 @@ const char* TelemetryMessage::_InternalParse(const char* ptr, ::_pbi::ParseConte
         } else
           goto handle_unusual;
         continue;
+      // repeated double omega_d2i_D = 13 [packed = true];
+      case 13:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 106)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedDoubleParser(_internal_mutable_omega_d2i_d(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<uint8_t>(tag) == 105) {
+          _internal_add_omega_d2i_d(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr));
+          ptr += sizeof(double);
+        } else
+          goto handle_unusual;
+        continue;
       default:
         goto handle_unusual;
     }  // switch
@@ -430,6 +448,11 @@ uint8_t* TelemetryMessage::_InternalSerialize(
   // repeated double theta_hat = 12 [packed = true];
   if (this->_internal_theta_hat_size() > 0) {
     target = stream->WriteFixedPacked(12, _internal_theta_hat(), target);
+  }
+
+  // repeated double omega_d2i_D = 13 [packed = true];
+  if (this->_internal_omega_d2i_d_size() > 0) {
+    target = stream->WriteFixedPacked(13, _internal_omega_d2i_d(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -569,6 +592,17 @@ size_t TelemetryMessage::ByteSizeLong() const {
     total_size += data_size;
   }
 
+  // repeated double omega_d2i_D = 13 [packed = true];
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_omega_d2i_d_size());
+    size_t data_size = 8UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+    }
+    total_size += data_size;
+  }
+
   // uint64 time = 1;
   if (this->_internal_time() != 0) {
     total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_time());
@@ -603,6 +637,7 @@ void TelemetryMessage::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const
   _this->_impl_.nu_top_.MergeFrom(from._impl_.nu_top_);
   _this->_impl_.nu_bottom_.MergeFrom(from._impl_.nu_bottom_);
   _this->_impl_.theta_hat_.MergeFrom(from._impl_.theta_hat_);
+  _this->_impl_.omega_d2i_d_.MergeFrom(from._impl_.omega_d2i_d_);
   if (from._internal_time() != 0) {
     _this->_internal_set_time(from._internal_time());
   }
@@ -634,6 +669,7 @@ void TelemetryMessage::InternalSwap(TelemetryMessage* other) {
   _impl_.nu_top_.InternalSwap(&other->_impl_.nu_top_);
   _impl_.nu_bottom_.InternalSwap(&other->_impl_.nu_bottom_);
   _impl_.theta_hat_.InternalSwap(&other->_impl_.theta_hat_);
+  _impl_.omega_d2i_d_.InternalSwap(&other->_impl_.omega_d2i_d_);
   swap(_impl_.time_, other->_impl_.time_);
 }
 

@@ -4,7 +4,7 @@
 #include <chrono>
 #include <iostream> 
 
-#define TELEMETRY_SEND_RATE_HZ (60) 
+#define TELEMETRY_SEND_RATE_HZ (60.0f) 
 using namespace Eigen;
 typedef Vector<double, 6> Vector6d;
 
@@ -21,6 +21,7 @@ struct telemetry_t
     Vector3d u_actual = Vector3d::Zero(); // actual control torque Nm
     std::vector<Vector6d> nu; // kalman filter estimate
     Vector3d theta_hat = Vector3d::Zero();
+    Vector3d omega_d2i_D = Vector3d::Zero();
 
     Quaterniond get_q_i2b()
     {

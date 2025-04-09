@@ -52,7 +52,9 @@ inline telemetry_t fromProto(const TelemetryMessage& proto) {
         fromProtoVector3d(proto.u_com()),
         fromProtoVector3d(proto.u_actual()),
         nu_vec,
-        fromProtoVector3d(proto.theta_hat())
+        fromProtoVector3d(proto.theta_hat()),
+        fromProtoVector3d(proto.omega_d2i_d())
+        
     };
 }
 
@@ -76,6 +78,7 @@ inline TelemetryMessage toProto(const telemetry_t& t) {
         proto.mutable_nu_bottom()->Add(0); proto.mutable_nu_bottom()->Add(0); proto.mutable_nu_bottom()->Add(0); 
     }
     toProtoVector3d(t.theta_hat, proto.mutable_theta_hat());
+    toProtoVector3d(t.omega_d2i_D, proto.mutable_omega_d2i_d());
 
     return proto;
 }
