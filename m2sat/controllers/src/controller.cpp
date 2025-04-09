@@ -101,7 +101,7 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     Vector3d omega_d2i_I = ( Vector3d() << 0,0,omega_b2i_I.z() ).finished(); // Angular rates of DF w.r. Inertial in Inertial Frame
 
     // Transformation Rotation of Angular Rates of the DF w.r. to Inertial from Inertial to DF
-    Vector3d omega_d2i_D = quat_rotate(t.q_i2d.conjugate(), omega_d2i_I); //  quat_mult(quat_mult(quat_conj(q_i2d),[0;omega_d2i_I]),q_i2d);
+    controller_output.omega_d2i_d = quat_rotate(t.q_i2d.conjugate(), omega_d2i_I); //  quat_mult(quat_mult(quat_conj(q_i2d),[0;omega_d2i_I]),q_i2d);
 
     /* Trajectory Design */
     static const double T_trans = 30.0f;
@@ -111,14 +111,14 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
         Vector3d added_desired_term; added_desired_term <<  0, 
         rot_trans*M_PI/(2*T_trans)*sin(M_PI/T_trans*(t.time*1e-3 -50)),
         0;
-        omega_d2i_D = omega_d2i_D + added_desired_term;
+        controller_output.omega_d2i_d += added_desired_term;
     }
     else if (t.time*1e-3 < T_trans + 300)
     {
         Vector3d added_desired_term;  added_desired_term << 0,
             -rot_trans*M_PI/(2*T_trans)*sin(M_PI/T_trans*(t.time*1e-3 -300)), 
             0;
-        omega_d2i_D = omega_d2i_D + added_desired_term;
+        controller_output.omega_d2i_d += added_desired_term;
     }
     
 
@@ -132,7 +132,7 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     /* Error signal */
     Quaterniond q_d2b = t.q_i2d.conjugate() * q_i2b; //  quat_mult(quat_conj(q_i2d),q_i2b);
     // Omega Desired w.r. Inertial in Body Fixed Frame (BFF)
-    Vector3d omega_d2i_B =  quat_rotate(q_d2b.conjugate(), omega_d2i_D); //  quat_mult(quat_mult(quat_conj(q_d2b),[0;omega_d2i_D]),q_d2b);
+    Vector3d omega_d2i_B =  quat_rotate(q_d2b.conjugate(), controller_output.omega_d2i_d); //  quat_mult(quat_mult(quat_conj(q_d2b),[0;omega_d2i_d]),q_d2b);
     Vector3d omega_b2d_B = t.omega_b2i_B - omega_d2i_B; // Omega Body w.r. Desired in BFF
     // Vector3d omega_b2d_B=  omega_b2i_B_hat - omega_d2i_B; // Omega Body w.r. Desired in BFF that has noise influece, used in control signal
 
@@ -177,7 +177,7 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     /* Dynamics for desired frame */
     Quaterniond omega_d2i_D_quaternion; 
     omega_d2i_D_quaternion.w() = 0; 
-    omega_d2i_D_quaternion.vec() = omega_d2i_D; // (Vector3d() << 0, 0, 5).finished();
+    omega_d2i_D_quaternion.vec() = controller_output.omega_d2i_d; // (Vector3d() << 0, 0, 5).finished();
     
     Quaterniond q_i2d_dot = t.q_i2d * omega_d2i_D_quaternion;  // quat_mult(q_i2d,[0;omega_d2i_D]); % q_dot of DF w.r. to Inertial Frame
     q_i2d_dot.coeffs() *= 0.5; // dont forget to scale by 0.5 since we cant do that above due to * operator override
