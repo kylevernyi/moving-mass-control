@@ -16,6 +16,7 @@
 #include <google/protobuf/port_def.inc>
 
 PROTOBUF_PRAGMA_INIT_SEG
+<<<<<<< Updated upstream
 
 namespace _pb = ::PROTOBUF_NAMESPACE_ID;
 namespace _pbi = _pb::internal;
@@ -36,18 +37,35 @@ PROTOBUF_CONSTEXPR TelemetryMessage::TelemetryMessage(
   , /*decltype(_impl_.omega_d2i_d_)*/{}
   , /*decltype(_impl_.time_)*/uint64_t{0u}
   , /*decltype(_impl_._cached_size_)*/{}} {}
+=======
+constexpr TelemetryMessage::TelemetryMessage(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : omega_b2i_()
+  , q_b2i_()
+  , q_i2d_()
+  , r_mass_()
+  , rdot_mass_()
+  , r_mass_commanded_()
+  , u_com_()
+  , u_actual_()
+  , nu_top_()
+  , nu_bottom_()
+  , theta_hat_()
+  , omega_d2i_d_()
+  , time_(uint64_t{0u}){}
+>>>>>>> Stashed changes
 struct TelemetryMessageDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR TelemetryMessageDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
+  constexpr TelemetryMessageDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
   ~TelemetryMessageDefaultTypeInternal() {}
   union {
     TelemetryMessage _instance;
   };
 };
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 TelemetryMessageDefaultTypeInternal _TelemetryMessage_default_instance_;
-static ::_pb::Metadata file_level_metadata_telemetry_2eproto[1];
-static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_telemetry_2eproto = nullptr;
-static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_telemetry_2eproto = nullptr;
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT TelemetryMessageDefaultTypeInternal _TelemetryMessage_default_instance_;
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_telemetry_2eproto[1];
+static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_telemetry_2eproto = nullptr;
+static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_telemetry_2eproto = nullptr;
 
 const uint32_t TableStruct_telemetry_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
@@ -56,6 +74,7 @@ const uint32_t TableStruct_telemetry_2eproto::offsets[] PROTOBUF_SECTION_VARIABL
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+<<<<<<< Updated upstream
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.time_),
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.omega_b2i_),
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.q_i2b_),
@@ -69,13 +88,28 @@ const uint32_t TableStruct_telemetry_2eproto::offsets[] PROTOBUF_SECTION_VARIABL
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.nu_bottom_),
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.theta_hat_),
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.omega_d2i_d_),
+=======
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, time_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, omega_b2i_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, q_b2i_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, q_i2d_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, r_mass_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, rdot_mass_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, r_mass_commanded_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, u_com_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, u_actual_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, nu_top_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, nu_bottom_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, theta_hat_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, omega_d2i_d_),
+>>>>>>> Stashed changes
 };
-static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::TelemetryMessage)},
 };
 
-static const ::_pb::Message* const file_default_instances[] = {
-  &::_TelemetryMessage_default_instance_._instance,
+static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_TelemetryMessage_default_instance_),
 };
 
 const char descriptor_table_protodef_telemetry_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -89,21 +123,19 @@ const char descriptor_table_protodef_telemetry_2eproto[] PROTOBUF_SECTION_VARIAB
   "hat\030\014 \003(\001B\002\020\001\022\027\n\013omega_d2i_D\030\r \003(\001B\002\020\001b\006"
   "proto3"
   ;
-static ::_pbi::once_flag descriptor_table_telemetry_2eproto_once;
-const ::_pbi::DescriptorTable descriptor_table_telemetry_2eproto = {
-    false, false, 326, descriptor_table_protodef_telemetry_2eproto,
-    "telemetry.proto",
-    &descriptor_table_telemetry_2eproto_once, nullptr, 0, 1,
-    schemas, file_default_instances, TableStruct_telemetry_2eproto::offsets,
-    file_level_metadata_telemetry_2eproto, file_level_enum_descriptors_telemetry_2eproto,
-    file_level_service_descriptors_telemetry_2eproto,
+static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_telemetry_2eproto_once;
+const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_telemetry_2eproto = {
+  false, false, 326, descriptor_table_protodef_telemetry_2eproto, "telemetry.proto", 
+  &descriptor_table_telemetry_2eproto_once, nullptr, 0, 1,
+  schemas, file_default_instances, TableStruct_telemetry_2eproto::offsets,
+  file_level_metadata_telemetry_2eproto, file_level_enum_descriptors_telemetry_2eproto, file_level_service_descriptors_telemetry_2eproto,
 };
-PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_telemetry_2eproto_getter() {
+PROTOBUF_ATTRIBUTE_WEAK const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable* descriptor_table_telemetry_2eproto_getter() {
   return &descriptor_table_telemetry_2eproto;
 }
 
 // Force running AddDescriptors() at dynamic initialization time.
-PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_telemetry_2eproto(&descriptor_table_telemetry_2eproto);
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY static ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptorsRunner dynamic_init_dummy_telemetry_2eproto(&descriptor_table_telemetry_2eproto);
 
 // ===================================================================
 
@@ -113,11 +145,27 @@ class TelemetryMessage::_Internal {
 
 TelemetryMessage::TelemetryMessage(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned),
+  omega_b2i_(arena),
+  q_b2i_(arena),
+  q_i2d_(arena),
+  r_mass_(arena),
+  rdot_mass_(arena),
+  r_mass_commanded_(arena),
+  u_com_(arena),
+  u_actual_(arena),
+  nu_top_(arena),
+  nu_bottom_(arena),
+  theta_hat_(arena),
+  omega_d2i_d_(arena) {
+  SharedCtor();
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
   // @@protoc_insertion_point(arena_constructor:TelemetryMessage)
 }
 TelemetryMessage::TelemetryMessage(const TelemetryMessage& from)
+<<<<<<< Updated upstream
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   TelemetryMessage* const _this = this; (void)_this;
   new (&_impl_) Impl_{
@@ -136,11 +184,27 @@ TelemetryMessage::TelemetryMessage(const TelemetryMessage& from)
     , decltype(_impl_.time_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
+=======
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      omega_b2i_(from.omega_b2i_),
+      q_b2i_(from.q_b2i_),
+      q_i2d_(from.q_i2d_),
+      r_mass_(from.r_mass_),
+      rdot_mass_(from.rdot_mass_),
+      r_mass_commanded_(from.r_mass_commanded_),
+      u_com_(from.u_com_),
+      u_actual_(from.u_actual_),
+      nu_top_(from.nu_top_),
+      nu_bottom_(from.nu_bottom_),
+      theta_hat_(from.theta_hat_),
+      omega_d2i_d_(from.omega_d2i_d_) {
+>>>>>>> Stashed changes
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _this->_impl_.time_ = from._impl_.time_;
+  time_ = from.time_;
   // @@protoc_insertion_point(copy_constructor:TelemetryMessage)
 }
 
+<<<<<<< Updated upstream
 inline void TelemetryMessage::SharedCtor(
     ::_pb::Arena* arena, bool is_message_owned) {
   (void)arena;
@@ -161,19 +225,22 @@ inline void TelemetryMessage::SharedCtor(
     , decltype(_impl_.time_){uint64_t{0u}}
     , /*decltype(_impl_._cached_size_)*/{}
   };
+=======
+inline void TelemetryMessage::SharedCtor() {
+time_ = uint64_t{0u};
+>>>>>>> Stashed changes
 }
 
 TelemetryMessage::~TelemetryMessage() {
   // @@protoc_insertion_point(destructor:TelemetryMessage)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  if (GetArenaForAllocation() != nullptr) return;
   SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 inline void TelemetryMessage::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+<<<<<<< Updated upstream
   _impl_.omega_b2i_.~RepeatedField();
   _impl_.q_i2b_.~RepeatedField();
   _impl_.q_i2d_.~RepeatedField();
@@ -186,10 +253,18 @@ inline void TelemetryMessage::SharedDtor() {
   _impl_.nu_bottom_.~RepeatedField();
   _impl_.theta_hat_.~RepeatedField();
   _impl_.omega_d2i_d_.~RepeatedField();
+=======
+>>>>>>> Stashed changes
 }
 
+void TelemetryMessage::ArenaDtor(void* object) {
+  TelemetryMessage* _this = reinterpret_cast< TelemetryMessage* >(object);
+  (void)_this;
+}
+void TelemetryMessage::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
 void TelemetryMessage::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
+  _cached_size_.Set(size);
 }
 
 void TelemetryMessage::Clear() {
@@ -198,6 +273,7 @@ void TelemetryMessage::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+<<<<<<< Updated upstream
   _impl_.omega_b2i_.Clear();
   _impl_.q_i2b_.Clear();
   _impl_.q_i2d_.Clear();
@@ -211,19 +287,34 @@ void TelemetryMessage::Clear() {
   _impl_.theta_hat_.Clear();
   _impl_.omega_d2i_d_.Clear();
   _impl_.time_ = uint64_t{0u};
+=======
+  omega_b2i_.Clear();
+  q_b2i_.Clear();
+  q_i2d_.Clear();
+  r_mass_.Clear();
+  rdot_mass_.Clear();
+  r_mass_commanded_.Clear();
+  u_com_.Clear();
+  u_actual_.Clear();
+  nu_top_.Clear();
+  nu_bottom_.Clear();
+  theta_hat_.Clear();
+  omega_d2i_d_.Clear();
+  time_ = uint64_t{0u};
+>>>>>>> Stashed changes
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* TelemetryMessage::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+const char* TelemetryMessage::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
     uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // uint64 time = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _impl_.time_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          time_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -392,7 +483,7 @@ uint8_t* TelemetryMessage::_InternalSerialize(
   // uint64 time = 1;
   if (this->_internal_time() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(1, this->_internal_time(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt64ToArray(1, this->_internal_time(), target);
   }
 
   // repeated double omega_b2i = 2 [packed = true];
@@ -456,7 +547,7 @@ uint8_t* TelemetryMessage::_InternalSerialize(
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:TelemetryMessage)
@@ -477,7 +568,8 @@ size_t TelemetryMessage::ByteSizeLong() const {
     size_t data_size = 8UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
     }
     total_size += data_size;
   }
@@ -488,7 +580,8 @@ size_t TelemetryMessage::ByteSizeLong() const {
     size_t data_size = 8UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
     }
     total_size += data_size;
   }
@@ -499,7 +592,8 @@ size_t TelemetryMessage::ByteSizeLong() const {
     size_t data_size = 8UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
     }
     total_size += data_size;
   }
@@ -510,7 +604,8 @@ size_t TelemetryMessage::ByteSizeLong() const {
     size_t data_size = 8UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
     }
     total_size += data_size;
   }
@@ -521,7 +616,8 @@ size_t TelemetryMessage::ByteSizeLong() const {
     size_t data_size = 8UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
     }
     total_size += data_size;
   }
@@ -532,7 +628,8 @@ size_t TelemetryMessage::ByteSizeLong() const {
     size_t data_size = 8UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
     }
     total_size += data_size;
   }
@@ -543,7 +640,8 @@ size_t TelemetryMessage::ByteSizeLong() const {
     size_t data_size = 8UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
     }
     total_size += data_size;
   }
@@ -554,7 +652,8 @@ size_t TelemetryMessage::ByteSizeLong() const {
     size_t data_size = 8UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
     }
     total_size += data_size;
   }
@@ -565,7 +664,8 @@ size_t TelemetryMessage::ByteSizeLong() const {
     size_t data_size = 8UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
     }
     total_size += data_size;
   }
@@ -576,7 +676,8 @@ size_t TelemetryMessage::ByteSizeLong() const {
     size_t data_size = 8UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
     }
     total_size += data_size;
   }
@@ -587,7 +688,8 @@ size_t TelemetryMessage::ByteSizeLong() const {
     size_t data_size = 8UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
     }
     total_size += data_size;
   }
@@ -598,34 +700,40 @@ size_t TelemetryMessage::ByteSizeLong() const {
     size_t data_size = 8UL * count;
     if (data_size > 0) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::Int32Size(static_cast<int32_t>(data_size));
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<int32_t>(data_size));
     }
     total_size += data_size;
   }
 
   // uint64 time = 1;
   if (this->_internal_time() != 0) {
-    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_time());
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64SizePlusOne(this->_internal_time());
   }
 
-  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+  return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
 }
 
 const ::PROTOBUF_NAMESPACE_ID::Message::ClassData TelemetryMessage::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
     TelemetryMessage::MergeImpl
 };
 const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*TelemetryMessage::GetClassData() const { return &_class_data_; }
 
+void TelemetryMessage::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+  static_cast<TelemetryMessage *>(to)->MergeFrom(
+      static_cast<const TelemetryMessage &>(from));
+}
 
-void TelemetryMessage::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
-  auto* const _this = static_cast<TelemetryMessage*>(&to_msg);
-  auto& from = static_cast<const TelemetryMessage&>(from_msg);
-  // @@protoc_insertion_point(class_specific_merge_from_start:TelemetryMessage)
-  GOOGLE_DCHECK_NE(&from, _this);
+
+void TelemetryMessage::MergeFrom(const TelemetryMessage& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:TelemetryMessage)
+  GOOGLE_DCHECK_NE(&from, this);
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
+<<<<<<< Updated upstream
   _this->_impl_.omega_b2i_.MergeFrom(from._impl_.omega_b2i_);
   _this->_impl_.q_i2b_.MergeFrom(from._impl_.q_i2b_);
   _this->_impl_.q_i2d_.MergeFrom(from._impl_.q_i2d_);
@@ -638,10 +746,24 @@ void TelemetryMessage::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const
   _this->_impl_.nu_bottom_.MergeFrom(from._impl_.nu_bottom_);
   _this->_impl_.theta_hat_.MergeFrom(from._impl_.theta_hat_);
   _this->_impl_.omega_d2i_d_.MergeFrom(from._impl_.omega_d2i_d_);
+=======
+  omega_b2i_.MergeFrom(from.omega_b2i_);
+  q_b2i_.MergeFrom(from.q_b2i_);
+  q_i2d_.MergeFrom(from.q_i2d_);
+  r_mass_.MergeFrom(from.r_mass_);
+  rdot_mass_.MergeFrom(from.rdot_mass_);
+  r_mass_commanded_.MergeFrom(from.r_mass_commanded_);
+  u_com_.MergeFrom(from.u_com_);
+  u_actual_.MergeFrom(from.u_actual_);
+  nu_top_.MergeFrom(from.nu_top_);
+  nu_bottom_.MergeFrom(from.nu_bottom_);
+  theta_hat_.MergeFrom(from.theta_hat_);
+  omega_d2i_d_.MergeFrom(from.omega_d2i_d_);
+>>>>>>> Stashed changes
   if (from._internal_time() != 0) {
-    _this->_internal_set_time(from._internal_time());
+    _internal_set_time(from._internal_time());
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void TelemetryMessage::CopyFrom(const TelemetryMessage& from) {
@@ -658,6 +780,7 @@ bool TelemetryMessage::IsInitialized() const {
 void TelemetryMessage::InternalSwap(TelemetryMessage* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+<<<<<<< Updated upstream
   _impl_.omega_b2i_.InternalSwap(&other->_impl_.omega_b2i_);
   _impl_.q_i2b_.InternalSwap(&other->_impl_.q_i2b_);
   _impl_.q_i2d_.InternalSwap(&other->_impl_.q_i2d_);
@@ -671,18 +794,32 @@ void TelemetryMessage::InternalSwap(TelemetryMessage* other) {
   _impl_.theta_hat_.InternalSwap(&other->_impl_.theta_hat_);
   _impl_.omega_d2i_d_.InternalSwap(&other->_impl_.omega_d2i_d_);
   swap(_impl_.time_, other->_impl_.time_);
+=======
+  omega_b2i_.InternalSwap(&other->omega_b2i_);
+  q_b2i_.InternalSwap(&other->q_b2i_);
+  q_i2d_.InternalSwap(&other->q_i2d_);
+  r_mass_.InternalSwap(&other->r_mass_);
+  rdot_mass_.InternalSwap(&other->rdot_mass_);
+  r_mass_commanded_.InternalSwap(&other->r_mass_commanded_);
+  u_com_.InternalSwap(&other->u_com_);
+  u_actual_.InternalSwap(&other->u_actual_);
+  nu_top_.InternalSwap(&other->nu_top_);
+  nu_bottom_.InternalSwap(&other->nu_bottom_);
+  theta_hat_.InternalSwap(&other->theta_hat_);
+  omega_d2i_d_.InternalSwap(&other->omega_d2i_d_);
+  swap(time_, other->time_);
+>>>>>>> Stashed changes
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata TelemetryMessage::GetMetadata() const {
-  return ::_pbi::AssignDescriptors(
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_telemetry_2eproto_getter, &descriptor_table_telemetry_2eproto_once,
       file_level_metadata_telemetry_2eproto[0]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::TelemetryMessage*
-Arena::CreateMaybeMessage< ::TelemetryMessage >(Arena* arena) {
+template<> PROTOBUF_NOINLINE ::TelemetryMessage* Arena::CreateMaybeMessage< ::TelemetryMessage >(Arena* arena) {
   return Arena::CreateMessageInternal< ::TelemetryMessage >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE

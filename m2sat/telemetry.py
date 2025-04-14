@@ -27,7 +27,7 @@ PLOT_CONFIGS = [
         'ylim': [-5, 5]
     },
     {
-        'field': 'q_b2i',
+        'field': 'q_i2b',
         'channels': 4,
         'title': 'Body Quaternion',
         'overlay': None,
@@ -66,6 +66,13 @@ PLOT_CONFIGS = [
         'overlay': None, 
         'ylim': [-1, 1] # check this 
     },
+    {
+        'field': 'omega_d2i_D',
+        'channels': 3,
+        'title': 'omega_d2i_D',
+        'overlay': None,
+        'ylim': [-1, 1] # check this 
+    }
 ]
 
 # For CSV logging, define the order and expected number of elements for each field.
@@ -79,7 +86,8 @@ CSV_FIELDS = [
     ('r_mass_commanded', 3),
     ('u_com', 3),
     ('u_actual', 3),
-    ('theta_hat',3)
+    ('theta_hat', 3),
+    ('omega_d2i_D', 3)
 ]
 
 # Colors to use for channels
@@ -103,7 +111,7 @@ class MultiTelemetryPlotter:
         self.data = {'time': []}
         # For fields that are single (non-overlay) store as: data[field] = [[], [], ...]
         # For overlay pairs, we'll store both separately.
-        self.fields = ['omega_b2i', 'q_b2i', 'q_i2d', 'rdot_mass', 'theta_hat']
+        self.fields = ['omega_b2i', 'q_b2i', 'q_i2d', 'rdot_mass', 'theta_hat', 'omega_d2i_D']
         for field in self.fields:
             self.data[field] = []  # We will later split into channels per plot
 

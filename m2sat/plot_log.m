@@ -1,14 +1,15 @@
 % time,omega_b2i_0,omega_b2i_1,omega_b2i_2,q_b2i_0,q_b2i_1,q_b2i_2,q_b2i_3,q_i2d_0,q_i2d_1,q_i2d_2,q_i2d_3,r_mass_0,r_mass_1,r_mass_2,rdot_mass_0,rdot_mass_1,rdot_mass_2,r_mass_commanded_0,r_mass_commanded_1,r_mass_commanded_2,u_com_0,u_com_1,u_com_2,u_actual_0,u_actual_1,u_actual_2,theta_hat_0,theta_hat_1,theta_hat_2
 % clc; close all;
-set(groot, 'DefaultTextInterpreter', 'latex'); % plot settings
-set(groot, 'DefaultLegendInterpreter', 'latex'); % plot settings
-set(groot, 'DefaultLineLineWidth', 2.1); set(groot, 'DefaultAxesFontSize', 12);
+
+close all;
 
 %% Get csv file
+addpath('matlab')
 files = dir('logs/*.csv'); % Get all CSV files
 if ~isempty(files)
     [~, idx] = max([files.datenum]); % Find the most recent file
     newestFile = strcat('logs/',files(idx).name);
+    % newestFile = strcat('logs/', "unstable_recovery.csv");
     data = readtable(newestFile, 'ReadVariableNames', true); % Read data
     fprintf('Loaded file: %s\n', newestFile);
 else
@@ -19,13 +20,36 @@ q_i2b = [data.q_b2i_0, data.q_b2i_1, data.q_b2i_2, data.q_b2i_3];
 C = QuatToDCM(q_i2b);
 ypr = squeeze(EulerFromDCM(C))';
 
-%%
+%% max torques
 m = [260; 260; 268] * 1e-3; % mass matrix
 r_max = [63; 63; 97.75] * 1e-3; % maximum offset 
 g_B_max = [0; 0; 9.81]; % gravity vectory associated with max torque is aligned with body 
 u_max = diag(m) * cross(-g_B_max, r_max); u_max(3) = 97.75*1e-3 * 268*1e-3 * 9.81;
 u_max = u_max*1000;
 % r_max_check = diag(m)\(cross(g_B_max,u_max)/(norm(g_B_max)^2))
+
+% Form some matrices
+data.q_b2i = [data.q_b2i_0 data.q_b2i_1 data.q_b2i_2 data.q_b2i_3];
+data.q_i2d = [data.q_i2d_0 data.q_i2d_1 data.q_i2d_2 data.q_i2d_3];
+
+data.omega_b2i_B = [data.omega_b2i_0 data.omega_b2i_1 data.omega_b2i_2];
+data.omega_b2i_I = zeros(size(data.omega_b2i_B));
+data.q_d2b = zeros(length(data.time), 4);
+%% Compute omega_b2i_I
+for i = 1:length(data.time)
+        % data.omega_b2i_I(i,:)=
+    omega_b2i_I = quat_mult(quat_mult(quat_conj(data.q_b2i(i,:)'),[0;data.omega_b2i_B(i,:)']), data.q_b2i(i,:)');
+    data.omega_b2i_I(i,:)= omega_b2i_I(2:4);
+
+
+    data.q_d2b(i,:) = quat_mult(quat_conj(data.q_i2d(i,:)'), quat_conj(data.q_b2i(i,:)')); %//  quat_mult(quat_conj(q_i2d),q_i2b);
+end
+
+%% Compute some velocity norms 
+
+omega_p_I = [data.omega_b2i_I(:,1), data.omega_b2i_I(:,2)]; % x and y 
+norm_omega_p_I = vecnorm(omega_p_I,2, 2);
+
 
 %% Plotting
 time = data.time / 1000; % to seconds
@@ -44,20 +68,20 @@ subplot(3,1,3); plot(time, ypr(:,3), 'b'); legend('roll'); ylabel('roll (rad)');
 xlabel('Time (s)');
 
 % Plot q_{b2i}
-% figure;
-% subplot(4,1,1); plot(time, data.q_b2i_0, 'k'); legend('$q_{b2i,0}$'); ylabel('$q_{b2i}$'); hold on;
-% subplot(4,1,2); plot(time, data.q_b2i_1, 'r'); legend('$q_{b2i,1}$'); ylabel('$q_{b2i}$'); 
-% subplot(4,1,3); plot(time, data.q_b2i_2, 'g'); legend('$q_{b2i,2}$'); ylabel('$q_{b2i}$'); 
-% subplot(4,1,4); plot(time, data.q_b2i_3, 'b'); legend('$q_{b2i,3}$'); ylabel('$q_{b2i}$'); 
-% xlabel('Time (s)'); sgtitle('$q_{b2i}$');
+figure;
+subplot(4,1,1); plot(time, data.q_b2i_0, 'k'); legend('$q_{b2i,0}$'); ylabel('$q_{b2i}$'); hold on;
+subplot(4,1,2); plot(time, data.q_b2i_1, 'r'); legend('$q_{b2i,1}$'); ylabel('$q_{b2i}$'); 
+subplot(4,1,3); plot(time, data.q_b2i_2, 'g'); legend('$q_{b2i,2}$'); ylabel('$q_{b2i}$'); 
+subplot(4,1,4); plot(time, data.q_b2i_3, 'b'); legend('$q_{b2i,3}$'); ylabel('$q_{b2i}$'); 
+xlabel('Time (s)'); sgtitle('$q_{b2i}$');
 
 % Plot q_{i2d}
-% figure; 
-% subplot(4,1,1); plot(time, data.q_i2d_0, 'k');  legend('$q_{i2d,0}$'); ylabel('$q_{i2d}$'); hold on;
-% subplot(4,1,2); plot(time, data.q_i2d_1, 'r'); legend('$q_{i2d,1}$'); ylabel('$q_{i2d}$');
-% subplot(4,1,3); plot(time, dau = [-1.54; 43.367; -25.11]ta.q_i2d_2, 'g'); legend('$q_{i2d,2}$'); ylabel('$q_{i2d}$');
-% subplot(4,1,4); plot(time, data.q_i2d_3, 'b'); legend('$q_{i2d,3}$'); ylabel('$q_{i2d}$');
-% xlabel('Time (s)');  sgtitle('$q_{i2d}$');
+figure; 
+subplot(4,1,1); plot(time, data.q_i2d_0, 'k');  legend('$q_{i2d,0}$'); ylabel('$q_{i2d}$'); hold on;
+subplot(4,1,2); plot(time, data.q_i2d_1, 'r'); legend('$q_{i2d,1}$'); ylabel('$q_{i2d}$');
+subplot(4,1,3); plot(time, data.q_i2d_2, 'g'); legend('$q_{i2d,2}$'); ylabel('$q_{i2d}$');
+subplot(4,1,4); plot(time, data.q_i2d_3, 'b'); legend('$q_{i2d,3}$'); ylabel('$q_{i2d}$');
+xlabel('Time (s)');  sgtitle('$q_{i2d}$');
 
 % Position plots
 % figure;
@@ -117,3 +141,13 @@ subplot(3,1,1); plot(time, data.u_actual_0*1000, 'r', time, ones(length(time), 1
 subplot(3,1,2); plot(time, data.u_actual_1*1000, 'g', time, ones(length(time), 1)*u_max(2), 'g--', time, -ones(length(time), 1)*u_max(2), 'g--'); legend('$u_{\mathrm{actual},y}$'); ylabel('$u_{\mathrm{actual}}$');
 subplot(3,1,3); plot(time, data.u_actual_2*1000, 'b', time, ones(length(time), 1)*u_max(3), 'b--', time, -ones(length(time), 1)*u_max(3), 'b--'); legend('$u_{\mathrm{actual},z}$'); ylabel('$u_{\mathrm{actual}}$');
 xlabel('Time (s)'); sgtitle('$u_{\mathrm{actual}}$ (mNm) with Max and Min Bounds');
+
+figure; 
+subplot(2,1,1); plot(time, norm_omega_p_I, '-k');
+title("$\|\omega_p^I\|$ vs $t$"); ylabel('$\|\omega_p^I\|$');  xlabel('Time (s)');
+
+subplot(2,1,2); plot(time, vecnorm(data.omega_b2i_I(:,3),2,2), '-k'); % z body rate represented n the inertial;
+title("$\|\omega_z^I\|$ vs $t$");  xlabel('Time (s)'); ylabel("$\|\omega_z^I\|$");
+
+
+

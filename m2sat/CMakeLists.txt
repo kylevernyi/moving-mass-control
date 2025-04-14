@@ -41,7 +41,8 @@ add_custom_target(proto_py ALL DEPENDS ${CMAKE_BINARY_DIR}/telemetry_pb2.py)
 include_directories(include ${EIGEN3_INCLUDE_DIRS} ${Protobuf_INCLUDE_DIRS} 
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/vnproglib/cpp/include
-    cppzmq)
+    cppzmq
+    )
 
 include(FetchContent)
 FetchContent_Declare(json
@@ -58,3 +59,5 @@ add_executable(tare_imu tare_imu/main.cpp)
 
 target_link_libraries(m2sat PRIVATE controllers Eigen3::Eigen protobuf::libprotobuf libvncxx zmq nlohmann_json::nlohmann_json)
 target_link_libraries(tare_imu PRIVATE libvncxx)
+
+
