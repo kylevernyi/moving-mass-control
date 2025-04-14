@@ -36,10 +36,10 @@ struct imu_data_vn_format_t
     void PullMeasurement(telemetry_t * tele) // fill our telemetry packet 
     {   
         // convert to Eigen quaternion
-        tele->q_b2i.w() = (quaternion.w); // shortest principle rotation correspondes to always positive first scalar component
-        tele->q_b2i.x() = quaternion.x;
-        tele->q_b2i.y() = quaternion.y;
-        tele->q_b2i.z() = quaternion.z;
+        tele->q_i2b.w() = (quaternion.w); // shortest principle rotation correspondes to always positive first scalar component
+        tele->q_i2b.x() = quaternion.x;
+        tele->q_i2b.y() = quaternion.y;
+        tele->q_i2b.z() = quaternion.z;
 
         // tele->q_b2i =  q_b2imu.inverse()*tele->q_b2i; 
         

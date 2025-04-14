@@ -120,7 +120,7 @@ int main()
 
             if (!kalman_filter_initialized)
             {
-                InitKalmanFilter(tele.omega_b2i_B, tele.q_b2i);
+                InitKalmanFilter(tele.omega_b2i_B, tele.q_i2b);
                 kalman_filter_initialized = true;
             }
         } 

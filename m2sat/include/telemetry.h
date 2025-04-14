@@ -11,7 +11,7 @@ typedef Vector<double, 6> Vector6d;
 struct telemetry_t 
 {
     uint64_t time = 0;
-    Quaterniond q_b2i = Quaterniond::Identity(); // q from body to inertial (from IMU)
+    Quaterniond q_i2b = Quaterniond::Identity(); // q from body to inertial (from IMU)
     Quaterniond q_i2d = Quaterniond::Identity();
     Vector3d omega_b2i_B = Vector3d::Zero(); // angular velocity of b2i in body frame (from IMU) rad/sec
     Vector3d r_mass = Vector3d::Zero(); //mass postion meters
@@ -23,10 +23,10 @@ struct telemetry_t
     Vector3d theta_hat = Vector3d::Zero();
     Vector3d omega_d2i_d = Vector3d::Zero();
 
-    Quaterniond get_q_i2b()
-    {
-        return q_b2i.conjugate();
-    }
+//     Quaterniond get_q_i2b()
+//     {
+//         return q_b2i.conjugate();
+//     }
 
     void Disp() {
     std::cout << "Time: " << time << " ms" << std::endl;

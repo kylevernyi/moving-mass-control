@@ -23,7 +23,7 @@ namespace _pbi = _pb::internal;
 PROTOBUF_CONSTEXPR TelemetryMessage::TelemetryMessage(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.omega_b2i_)*/{}
-  , /*decltype(_impl_.q_b2i_)*/{}
+  , /*decltype(_impl_.q_i2b_)*/{}
   , /*decltype(_impl_.q_i2d_)*/{}
   , /*decltype(_impl_.r_mass_)*/{}
   , /*decltype(_impl_.rdot_mass_)*/{}
@@ -58,7 +58,7 @@ const uint32_t TableStruct_telemetry_2eproto::offsets[] PROTOBUF_SECTION_VARIABL
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.time_),
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.omega_b2i_),
-  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.q_b2i_),
+  PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.q_i2b_),
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.q_i2d_),
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.r_mass_),
   PROTOBUF_FIELD_OFFSET(::TelemetryMessage, _impl_.rdot_mass_),
@@ -81,7 +81,7 @@ static const ::_pb::Message* const file_default_instances[] = {
 const char descriptor_table_protodef_telemetry_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\017telemetry.proto\"\252\002\n\020TelemetryMessage\022\014"
   "\n\004time\030\001 \001(\004\022\025\n\tomega_b2i\030\002 \003(\001B\002\020\001\022\021\n\005q"
-  "_b2i\030\003 \003(\001B\002\020\001\022\021\n\005q_i2d\030\004 \003(\001B\002\020\001\022\022\n\006r_m"
+  "_i2b\030\003 \003(\001B\002\020\001\022\021\n\005q_i2d\030\004 \003(\001B\002\020\001\022\022\n\006r_m"
   "ass\030\005 \003(\001B\002\020\001\022\025\n\trdot_mass\030\006 \003(\001B\002\020\001\022\034\n\020"
   "r_mass_commanded\030\007 \003(\001B\002\020\001\022\021\n\005u_com\030\010 \003("
   "\001B\002\020\001\022\024\n\010u_actual\030\t \003(\001B\002\020\001\022\022\n\006nu_top\030\n "
@@ -122,7 +122,7 @@ TelemetryMessage::TelemetryMessage(const TelemetryMessage& from)
   TelemetryMessage* const _this = this; (void)_this;
   new (&_impl_) Impl_{
       decltype(_impl_.omega_b2i_){from._impl_.omega_b2i_}
-    , decltype(_impl_.q_b2i_){from._impl_.q_b2i_}
+    , decltype(_impl_.q_i2b_){from._impl_.q_i2b_}
     , decltype(_impl_.q_i2d_){from._impl_.q_i2d_}
     , decltype(_impl_.r_mass_){from._impl_.r_mass_}
     , decltype(_impl_.rdot_mass_){from._impl_.rdot_mass_}
@@ -147,7 +147,7 @@ inline void TelemetryMessage::SharedCtor(
   (void)is_message_owned;
   new (&_impl_) Impl_{
       decltype(_impl_.omega_b2i_){arena}
-    , decltype(_impl_.q_b2i_){arena}
+    , decltype(_impl_.q_i2b_){arena}
     , decltype(_impl_.q_i2d_){arena}
     , decltype(_impl_.r_mass_){arena}
     , decltype(_impl_.rdot_mass_){arena}
@@ -175,7 +175,7 @@ TelemetryMessage::~TelemetryMessage() {
 inline void TelemetryMessage::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   _impl_.omega_b2i_.~RepeatedField();
-  _impl_.q_b2i_.~RepeatedField();
+  _impl_.q_i2b_.~RepeatedField();
   _impl_.q_i2d_.~RepeatedField();
   _impl_.r_mass_.~RepeatedField();
   _impl_.rdot_mass_.~RepeatedField();
@@ -199,7 +199,7 @@ void TelemetryMessage::Clear() {
   (void) cached_has_bits;
 
   _impl_.omega_b2i_.Clear();
-  _impl_.q_b2i_.Clear();
+  _impl_.q_i2b_.Clear();
   _impl_.q_i2d_.Clear();
   _impl_.r_mass_.Clear();
   _impl_.rdot_mass_.Clear();
@@ -239,13 +239,13 @@ const char* TelemetryMessage::_InternalParse(const char* ptr, ::_pbi::ParseConte
         } else
           goto handle_unusual;
         continue;
-      // repeated double q_b2i = 3 [packed = true];
+      // repeated double q_i2b = 3 [packed = true];
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedDoubleParser(_internal_mutable_q_b2i(), ptr, ctx);
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedDoubleParser(_internal_mutable_q_i2b(), ptr, ctx);
           CHK_(ptr);
         } else if (static_cast<uint8_t>(tag) == 25) {
-          _internal_add_q_b2i(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr));
+          _internal_add_q_i2b(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr));
           ptr += sizeof(double);
         } else
           goto handle_unusual;
@@ -400,9 +400,9 @@ uint8_t* TelemetryMessage::_InternalSerialize(
     target = stream->WriteFixedPacked(2, _internal_omega_b2i(), target);
   }
 
-  // repeated double q_b2i = 3 [packed = true];
-  if (this->_internal_q_b2i_size() > 0) {
-    target = stream->WriteFixedPacked(3, _internal_q_b2i(), target);
+  // repeated double q_i2b = 3 [packed = true];
+  if (this->_internal_q_i2b_size() > 0) {
+    target = stream->WriteFixedPacked(3, _internal_q_i2b(), target);
   }
 
   // repeated double q_i2d = 4 [packed = true];
@@ -482,9 +482,9 @@ size_t TelemetryMessage::ByteSizeLong() const {
     total_size += data_size;
   }
 
-  // repeated double q_b2i = 3 [packed = true];
+  // repeated double q_i2b = 3 [packed = true];
   {
-    unsigned int count = static_cast<unsigned int>(this->_internal_q_b2i_size());
+    unsigned int count = static_cast<unsigned int>(this->_internal_q_i2b_size());
     size_t data_size = 8UL * count;
     if (data_size > 0) {
       total_size += 1 +
@@ -627,7 +627,7 @@ void TelemetryMessage::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const
   (void) cached_has_bits;
 
   _this->_impl_.omega_b2i_.MergeFrom(from._impl_.omega_b2i_);
-  _this->_impl_.q_b2i_.MergeFrom(from._impl_.q_b2i_);
+  _this->_impl_.q_i2b_.MergeFrom(from._impl_.q_i2b_);
   _this->_impl_.q_i2d_.MergeFrom(from._impl_.q_i2d_);
   _this->_impl_.r_mass_.MergeFrom(from._impl_.r_mass_);
   _this->_impl_.rdot_mass_.MergeFrom(from._impl_.rdot_mass_);
@@ -659,7 +659,7 @@ void TelemetryMessage::InternalSwap(TelemetryMessage* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   _impl_.omega_b2i_.InternalSwap(&other->_impl_.omega_b2i_);
-  _impl_.q_b2i_.InternalSwap(&other->_impl_.q_b2i_);
+  _impl_.q_i2b_.InternalSwap(&other->_impl_.q_i2b_);
   _impl_.q_i2d_.InternalSwap(&other->_impl_.q_i2d_);
   _impl_.r_mass_.InternalSwap(&other->_impl_.r_mass_);
   _impl_.rdot_mass_.InternalSwap(&other->_impl_.rdot_mass_);

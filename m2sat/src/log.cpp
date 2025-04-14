@@ -71,7 +71,7 @@ void LogTele(std::ofstream& file, const telemetry_t & tele)
     Matrix<double,1,1>  time_mat; time_mat << double(tele.time);
     saveData(file, time_mat);
     saveData(file, tele.omega_b2i_B);
-    saveData(file, tele.q_b2i.coeffs());
+    saveData(file, tele.q_i2b.coeffs());
     saveData(file, tele.q_i2d.coeffs());
     saveData(file, tele.r_mass);
     saveData(file, tele.rdot_mass);
