@@ -18,7 +18,8 @@ Vector3d quat_rotate(const Quaterniond& q, const Vector3d& v);
 Matrix3d skew(const Vector3d& v);
 Quaterniond quat_mult(const Quaterniond& q, const Quaterniond& p);
 int rank(MatrixXd mat);
-
+Vector3d projected_update(const Vector3d& theta_hat, const Matrix3d& Phi, Vector3d r,
+    const Vector3d& theta_hat_min_, const Vector3d& theta_hat_max_); // PROJ
 
 int SetGains(Matrix3d K_1_, Matrix3d K_2_, Matrix3d K_3_, Matrix3d K_4_, Matrix3d alpha_1_, Matrix3d alpha_2_, Matrix3d gamma_gain_, Matrix3d CL_gain_, Matrix3d adaptive_gain_)
 {
@@ -28,7 +29,7 @@ int SetGains(Matrix3d K_1_, Matrix3d K_2_, Matrix3d K_3_, Matrix3d K_4_, Matrix3
     K_4 = K_4_;    
 
     alpha_1 = alpha_1_;
-    alpha_2 = K_2.inverse()*alpha_2_;
+    alpha_2 = K_3.inverse()*alpha_2_;
     gamma_gain = gamma_gain_;
     
     CL_gain = CL_gain_;
@@ -89,7 +90,7 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     telemetry_t controller_output = t; // maybe dont do this 
 
     // Extract states
-    Quaterniond q_i2b = t.get_q_i2b();
+    Quaterniond q_i2b = t.q_i2b; //t.get_q_i2b();
     // Vector3d omega_b2i_B_hat = nu.back().head<3>();  // first 3 elements
     // Vector3d omega_b2i_B_dot_hat = nu.back().segment(3,3); // last 3 elements 
 
@@ -101,8 +102,54 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     Vector3d omega_d2i_I = ( Vector3d() << 0,0,omega_b2i_I.z() ).finished(); // Angular rates of DF w.r. Inertial in Inertial Frame
 
     // Transformation Rotation of Angular Rates of the DF w.r. to Inertial from Inertial to DF
-    Vector3d omega_d2i_D = quat_rotate(t.q_i2d.conjugate(), omega_d2i_I); //  quat_mult(quat_mult(quat_conj(q_i2d),[0;omega_d2i_I]),q_i2d);
+    controller_output.omega_d2i_d = quat_rotate(t.q_i2d.conjugate(), omega_d2i_I); //  quat_mult(quat_mult(quat_conj(q_i2d),[0;omega_d2i_I]),q_i2d);
 
+    /* Trajectory Design */
+    static const double T_start = 15.0f; // when it starts
+
+    static const double T_trans = 15.0f; // half as long as it takes manuever takes to get to full pitch 
+    static const double T_offset =  T_trans + T_start; 
+
+    static const double T_begin_second_dip = T_offset + 20.0f;
+    static const double T_offset_2 = T_begin_second_dip + T_trans; 
+
+    static const double rot_trans = M_PI/12.0f;
+    if (t.time*1e-3 < T_start)
+    {
+        // do nothing to desired trajectory
+        std::cout << "Initial Level" << std::endl;
+    }
+    else if (t.time*1e-3 >= T_start && (t.time*1e-3 <  T_offset)) // in the time for the first dip
+    {
+        Vector3d added_desired_term; added_desired_term <<  
+            0, 
+            rot_trans*M_PI/(2*T_trans)*sin(M_PI/T_trans*(t.time*1e-3 - T_start)),
+            0;
+        controller_output.omega_d2i_d += added_desired_term;
+        std::cout << "Dip 1" << std::endl;
+    }
+    else if (t.time*1e-3 >= T_offset && t.time*1e-3 < T_begin_second_dip)  // stabilize to origin for this long
+    {
+        // do nothing to desired trajectory
+        std::cout << "Pitched up" << std::endl;
+    }
+    else if (t.time*1e-3 >= T_begin_second_dip && t.time*1e-3 < T_begin_second_dip+T_trans) // in the time 
+    {
+        Vector3d added_desired_term;  
+        added_desired_term << 0,
+            -rot_trans*M_PI/(2*T_trans)*sin(M_PI/T_trans*(t.time*1e-3 - T_begin_second_dip)), 
+            0;
+        controller_output.omega_d2i_d += added_desired_term;
+        std::cout << "Dip 2 back down" << std::endl;
+    } else if (t.time*1e-3 >= T_begin_second_dip+T_trans)
+    {
+        std::cout << "Finished" << std::endl;
+    }
+    
+
+    
+    
+    
     Vector3d omega_dot_d2i_D = (Vector3d() << 0,0,0).finished(); //0; 0*A*exp(-f*t)*(f*sin(b*t) - b*cos(b*t));0];
     Vector3d omega_dot_d2i_I = quat_rotate(q_i2b, omega_dot_d2i_D); // quat_mult(quat_mult(q_i2d,[0;omega_dot_d2i_D]),quat_conj(q_i2d));
     Vector3d omega_dot_d2i_B = quat_rotate(q_i2b.conjugate(), omega_dot_d2i_I); // quat_mult(quat_mult(quat_conj(q_i2b),[0;omega_dot_d2i_I]),q_i2b);
@@ -110,12 +157,12 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     /* Error signal */
     Quaterniond q_d2b = t.q_i2d.conjugate() * q_i2b; //  quat_mult(quat_conj(q_i2d),q_i2b);
     // Omega Desired w.r. Inertial in Body Fixed Frame (BFF)
-    Vector3d omega_d2i_B =  quat_rotate(q_d2b.conjugate(), omega_d2i_D); //  quat_mult(quat_mult(quat_conj(q_d2b),[0;omega_d2i_D]),q_d2b);
+    Vector3d omega_d2i_B =  quat_rotate(q_d2b.conjugate(), controller_output.omega_d2i_d); //  quat_mult(quat_mult(quat_conj(q_d2b),[0;omega_d2i_d]),q_d2b);
     Vector3d omega_b2d_B = t.omega_b2i_B - omega_d2i_B; // Omega Body w.r. Desired in BFF
     // Vector3d omega_b2d_B=  omega_b2i_B_hat - omega_d2i_B; // Omega Body w.r. Desired in BFF that has noise influece, used in control signal
 
 
-    Vector3d r = omega_b2d_B + alpha_2*q_d2b.vec(); // Definition of r error signal
+    Vector3d r = omega_b2d_B +alpha_2*q_d2b.vec(); // Definition of r error signal
 
     /* Update of J(t) as a function of new mass position */
     Matrix3d Jm_B_dot;
@@ -129,19 +176,34 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     Matrix3d Phi = -M*skew(g_B); // Phi definition as in ref[DOI: 10.2514/1.60380]
 
     /* Control Torque as Designed by Lyapunov Analysis */
-    Matrix3d Proj_operator = ( Matrix3d::Identity() - (g_B*g_B.transpose()) ) / g_B.squaredNorm();
-    controller_output.u_com = Proj_operator * (-K_1*Jm_B_dot*(0.5*r - t.omega_b2i_B) + K_2*skew(t.omega_b2i_B)*J*t.omega_b2i_B - adaptive_gain*Phi*t.theta_hat - K_3*r ) // -diag((theta_hat).^2)*r
-        + Proj_operator*J*(omega_dot_d2i_B + K_4*skew(omega_d2i_B)*omega_b2d_B - 0.5*alpha_1*(skew(q_d2b.vec()) + q_d2b.w()*Matrix3d::Identity())*omega_b2d_B); // desired torque 
+    Matrix3d Proj_operator = Matrix3d::Identity() - ((g_B*g_B.transpose())) / g_B.squaredNorm();
+    controller_output.u_com = Proj_operator * (
+        -K_1*Jm_B_dot*(0.5*r - t.omega_b2i_B) + 
+        K_2*skew(t.omega_b2i_B)*J*t.omega_b2i_B 
+        - adaptive_gain*Phi*t.theta_hat 
+        - K_3*r ) // -diag((theta_hat).^2)*r
+        + Proj_operator*J*(omega_dot_d2i_B 
+        + K_4*skew(omega_d2i_B)*omega_b2d_B 
+        - 0.5*alpha_1*(skew(q_d2b.vec()) + q_d2b.w()*Matrix3d::Identity())*omega_b2d_B); // desired torque 
 
 
-    // std::cout << "alpha_2 Error term: " << (alpha_2*q_d2b.vec()).transpose() << std::endl;
+    std::cout << "alpha_2 Error term: " << (alpha_2*q_d2b.vec()).transpose() << std::endl;
     // std::cout << "K_1 term: " << (-K_1*Jm_B_dot*(0.5*r - t.omega_b2i_B)).transpose() << std::endl;
-    // std::cout << "K_2 Derivative term: " << (K_2*skew(t.omega_b2i_B)*J*t.omega_b2i_B).transpose() << std::endl;
-    // std::cout << "K_3 Error term: " << (-K_3*r).transpose() << std::endl;
-    // std::cout << "K_4 Derivative term: " << ( K_4*skew(omega_d2i_B)*omega_b2d_B).transpose() << std::endl;
-    // std::cout << "Alpha_1 term: " << (alpha_1*(skew(q_d2b.vec()) + q_d2b.w()*Matrix3d::Identity())*omega_b2d_B).transpose() << std::endl;
-    // std::cout << "Adaptive term: " << (adaptive_gain*Phi*t.theta_hat).transpose() << std::endl;
+    std::cout << "K_2 Derivative term: " << (K_2*skew(t.omega_b2i_B)*J*t.omega_b2i_B).transpose() << std::endl;
+    std::cout << "K_3 Error term: " << (-K_3*r).transpose() << std::endl;
+    std::cout << "K_4 Derivative term: " << ( K_4*skew(omega_d2i_B)*omega_b2d_B).transpose() << std::endl;
+    std::cout << "Alpha_1 term: " << (alpha_1*(skew(q_d2b.vec()) + q_d2b.w()*Matrix3d::Identity())*omega_b2d_B).transpose() << std::endl;
+    std::cout << "Adaptive term: " << (adaptive_gain*Phi*t.theta_hat).transpose() << std::endl;
    
+    /* Project torque to obtainable moment set */
+    // Vector3d scaling_terms; 
+    // scaling_terms << u_com_max_x / std::abs(controller_output.u_com.x()) , 
+    //     u_com_max_y / std::abs(controller_output.u_com.y()),
+    //     u_com_max_z / std::abs(controller_output.u_com.z());
+
+    // double scalar = scaling_terms.minCoeff(); // get scalar we will use to scale torque
+    // controller_output.u_com *= scalar; // scale desired torque
+
     /* Map control Torque to mass positions */
     // Transformation of u_com to Commanded Positions as in ref[DOI: 10.2514/1.60380]
     controller_output.r_mass_commanded = mm_mass_matrix.inverse() * (g_B.cross(controller_output.u_com) / g_B.squaredNorm() ); // desired commanded mass positions
@@ -150,80 +212,23 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     /* Make sure r_mass_commanded is within saturation limits (makes sense to apply here before stepper mapping) */
     controller_output.r_mass_commanded = SaturationLimit(controller_output.r_mass_commanded);
 
-
-    /* Concurrent learning data selection algorithm */
-    static int p_CL_idx = 0;
-    if (t.nu.size() > CL_turn_on) // make sure we have state estimate
-    {
-        // initialization done once
-        static Vector<double, 9> Phi_previous = Phi.reshaped(9, 1);
-        static int current_index_for_cyclic_stack = p_CL_idx;
-
-        // extract states
-        Vector3d omega_hat = t.nu.back().segment(0,3);
-        Vector3d omega_dot_hat = t.nu.back().segment(3,3);
-
-        // append Phi to a new stack to check if rank changes
-        MatrixXd Phi_new_stack = Phi_stack; // [Phi_stack, Phi(:)];
-        Phi_new_stack.conservativeResize(Eigen::NoChange, Phi_new_stack.cols() + 1);
-        Phi_new_stack.col(Phi_new_stack.cols() - 1) = Phi.reshaped(9,1); // added new col, set new col equal to Phi(:)
-        
-        // Point selection criteria
-        if ( ( (Phi.reshaped(9,1)- Phi_previous).squaredNorm()  >= CL_point_accept_epsilon)  || (rank(Phi_new_stack) > rank(Phi_stack)) )
-        {
-            Vector3d Tau_j; // = J*omega_dot_hat(:,w_iter) +  cross(omega_hat(:,w_iter),J*omega_hat(:,w_iter)) - u_com(:,w_iter);
-
-            if (p_CL_idx < p_bar) // record more data until p_bar points
-            {
-                p_CL_idx = p_CL_idx+1;
-                current_index_for_cyclic_stack = p_CL_idx;
-                Phi_stack = Phi_new_stack; 
-                Phi_previous = Phi.reshaped(9,1);
-
-                Tau_stack.conservativeResize(Eigen::NoChange, p_CL_idx);
-                Tau_stack.col(Tau_stack.cols() - 1) = Tau_j; // insert tau into stack
-            }
-            else
-            {
-                // cyclic history stack
-                Phi_stack.col(current_index_for_cyclic_stack) = Phi.reshaped(9,1); // Insert the new element at the current index
-                Tau_stack.col(current_index_for_cyclic_stack) = Tau_j; // Insert the new element at the current index
-                current_index_for_cyclic_stack = (current_index_for_cyclic_stack % p_bar) + 1;
-            }
-            // point_added = [point_added t]; %  record that we stored a point
-        }
-    }
-
-    /* Concurrent learning error signal */
-    Vector3d concurrent_learning_Tau_ext; concurrent_learning_Tau_ext << 0,0,0;
-
-        for (int j=1; j<= p_CL_idx; j++)
-        {
-            Vector3d Tau_j = Tau_stack.col(j); // jth delta from storage
-            Matrix3d Phi_j = Phi_stack.col(j).reshaped(3,3); // jth phi matrix from storage
-            Vector3d epsilon_Tau_ext = Phi_j*t.theta_hat - Tau_j;
-            concurrent_learning_Tau_ext += Phi_j*epsilon_Tau_ext;  
-        }
-
-
+    
     /* Dynamics for desired frame */
     Quaterniond omega_d2i_D_quaternion; 
     omega_d2i_D_quaternion.w() = 0; 
-    omega_d2i_D_quaternion.vec() = omega_d2i_D; // (Vector3d() << 0, 0, 5).finished();
+    omega_d2i_D_quaternion.vec() = controller_output.omega_d2i_d; // (Vector3d() << 0, 0, 5).finished();
     
     Quaterniond q_i2d_dot = t.q_i2d * omega_d2i_D_quaternion;  // quat_mult(q_i2d,[0;omega_d2i_D]); % q_dot of DF w.r. to Inertial Frame
     q_i2d_dot.coeffs() *= 0.5; // dont forget to scale by 0.5 since we cant do that above due to * operator override
     controller_output.q_i2d.coeffs() += q_i2d_dot.coeffs()*dt_seconds; 
     controller_output.q_i2d.normalize();
-    
-    std::cout << "q_i2d_dot: " << q_i2d_dot.coeffs().transpose() << std::endl;
-    std::cout << "q_i2d: " << t.q_i2d.coeffs().transpose() << std::endl;
-    std::cout << "q_i2d normalized: " << t.q_i2d.coeffs().transpose() << std::endl;
-
 
     /* Update law */
-    Vector3d theta_hat_dot = gamma_gain * ( (Phi.transpose()*r)  + CL_on*CL_gain*concurrent_learning_Tau_ext); //  Adaptive update law
-    std::cout << "hat dot" << theta_hat_dot.transpose() << std::endl;
+    // Vector3d theta_hat_dot = gamma_gain * (Phi.transpose()*r) ; //+ CL_on*CL_gain*concurrent_learning_Tau_ext); //  Adaptive update law
+    Vector3d theta_hat_dot =  projected_update(controller_output.theta_hat, Phi, r,
+        theta_hat_min,  theta_hat_max);
+
+    // std::cout << "hat dot" << theta_hat_dot.transpose() << std::endl;
     controller_output.theta_hat += theta_hat_dot*dt_seconds; 
 
     /* Compute our actual control torque at the moment for logging */
@@ -234,33 +239,33 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
 
 telemetry_t PD_Controller(telemetry_t t, double dt_seconds)
 {
-    telemetry_t controller_output = t; // maybe dont do this 
+    // telemetry_t controller_output = t; // maybe dont do this 
 
-    Eigen::Quaterniond q_error = Quaterniond(1,0,0,0) * t.q_b2i.conjugate();
-    q_error.normalize();
-    if (q_error.w() < 0.0)
-        q_error.coeffs() *= -1.0;
+    // Eigen::Quaterniond q_error = Quaterniond(1,0,0,0) * t.q_b2i.conjugate();
+    // q_error.normalize();
+    // if (q_error.w() < 0.0)
+        // q_error.coeffs() *= -1.0;
+// 
+        // Quaterniond q_i2b = t.q_i2b; //t.get_q_i2b();
+        // Vector3d g_B = quat_rotate(q_i2b.conjugate(), g_I);  //quat_mult(quat_mult(quat_conj(q_i2b),[0;g_I]),q_i2b);
+    // 
+    // Eigen::AngleAxisd aa(q_error);
+    // Eigen::Vector3d rot_axis = aa.axis();   // unit vector
+    // double rot_angle = aa.angle();          // in radians
+// 
+    // Matrix3d Proj_operator =  Matrix3d::Identity() - ((g_B*g_B.transpose()) ) / g_B.squaredNorm();
 
-        Quaterniond q_i2b = t.get_q_i2b();
-        Vector3d g_B = quat_rotate(q_i2b.conjugate(), g_I);  //quat_mult(quat_mult(quat_conj(q_i2b),[0;g_I]),q_i2b);
-    
-    Eigen::AngleAxisd aa(q_error);
-    Eigen::Vector3d rot_axis = aa.axis();   // unit vector
-    double rot_angle = aa.angle();          // in radians
 
-    Matrix3d Proj_operator = ( Matrix3d::Identity() - (g_B*g_B.transpose()) ) / g_B.squaredNorm();
-
-
-    controller_output.u_com = K_1 * rot_angle * rot_axis  - K_2 *Proj_operator* t.omega_b2i_B; // proportional , derivative body frame
+    // controller_output.u_com = K_1 * rot_angle * rot_axis  - K_2 *Proj_operator* t.omega_b2i_B; // proportional , derivative body frame
 
  
-    controller_output.r_mass_commanded = mm_mass_matrix.inverse() * (g_B.cross(controller_output.u_com) / g_B.squaredNorm() ); // desired commanded mass positions
-    // at this point, r_mass_commanded is relative to the middle zero position of the sliding masses (not the zero limit switch position)
-    /* Make sure r_mass_commanded is within saturation limits (makes sense to apply here before stepper mapping) */
-    controller_output.r_mass_commanded = SaturationLimit(controller_output.r_mass_commanded);
-    controller_output.u_actual = -mm_mass_matrix * g_B.cross(t.r_mass);
+    // controller_output.r_mass_commanded = mm_mass_matrix.inverse() * (g_B.cross(controller_output.u_com) / g_B.squaredNorm() ); // desired commanded mass positions
+    // // at this point, r_mass_commanded is relative to the middle zero position of the sliding masses (not the zero limit switch position)
+    // /* Make sure r_mass_commanded is within saturation limits (makes sense to apply here before stepper mapping) */
+    // controller_output.r_mass_commanded = SaturationLimit(controller_output.r_mass_commanded);
+    // controller_output.u_actual = -mm_mass_matrix * g_B.cross(t.r_mass);
 
-    return controller_output;
+    // return controller_output;
 }
 /* Apply a saturation limit to the mass position based on mechanical limitations of the vehicle */
 Vector3d SaturationLimit(Vector3d r_com)
@@ -321,3 +326,79 @@ int rank(MatrixXd mat)
     return rank_;
 }
 
+// Projection operator 
+Vector3d projected_update(const Vector3d& theta_hat, const Matrix3d& Phi, Vector3d r,
+    const Vector3d& theta_hat_min_, const Vector3d& theta_hat_max_)
+{
+    Vector3d theta_hat_dot = gamma_gain * Phi.transpose() * r;
+
+    for (int i = 0; i < theta_hat.size(); ++i)
+    {
+        // If at lower bound and trying to decrease, block update
+        if (theta_hat(i) <= theta_hat_min(i) && theta_hat_dot(i) < 0)
+        {
+            theta_hat_dot(i) = 0;
+        }
+        // If at upper bound and trying to increase, block update
+        else if (theta_hat(i) >= theta_hat_max(i) && theta_hat_dot(i) > 0)
+        {
+            theta_hat_dot(i) = 0;
+        }
+    }
+
+    return theta_hat_dot;
+}
+
+// /* Concurrent learning data selection algorithm */
+// static int p_CL_idx = 0;
+// if (t.nu.size() > CL_turn_on) // make sure we have state estimate
+// {
+//     // initialization done once
+//     static Vector<double, 9> Phi_previous = Phi.reshaped(9, 1);
+//     static int current_index_for_cyclic_stack = p_CL_idx;
+
+//     // extract states
+//     Vector3d omega_hat = t.nu.back().segment(0,3);
+//     Vector3d omega_dot_hat = t.nu.back().segment(3,3);
+
+//     // append Phi to a new stack to check if rank changes
+//     MatrixXd Phi_new_stack = Phi_stack; // [Phi_stack, Phi(:)];
+//     Phi_new_stack.conservativeResize(Eigen::NoChange, Phi_new_stack.cols() + 1);
+//     Phi_new_stack.col(Phi_new_stack.cols() - 1) = Phi.reshaped(9,1); // added new col, set new col equal to Phi(:)
+    
+//     // Point selection criteria
+//     if ( ( (Phi.reshaped(9,1)- Phi_previous).squaredNorm()  >= CL_point_accept_epsilon)  || (rank(Phi_new_stack) > rank(Phi_stack)) )
+//     {
+//         Vector3d Tau_j; // = J*omega_dot_hat(:,w_iter) +  cross(omega_hat(:,w_iter),J*omega_hat(:,w_iter)) - u_com(:,w_iter);
+
+//         if (p_CL_idx < p_bar) // record more data until p_bar points
+//         {
+//             p_CL_idx = p_CL_idx+1;
+//             current_index_for_cyclic_stack = p_CL_idx;
+//             Phi_stack = Phi_new_stack; 
+//             Phi_previous = Phi.reshaped(9,1);
+
+//             Tau_stack.conservativeResize(Eigen::NoChange, p_CL_idx);
+//             Tau_stack.col(Tau_stack.cols() - 1) = Tau_j; // insert tau into stack
+//         }
+//         else
+//         {
+//             // cyclic history stack
+//             Phi_stack.col(current_index_for_cyclic_stack) = Phi.reshaped(9,1); // Insert the new element at the current index
+//             Tau_stack.col(current_index_for_cyclic_stack) = Tau_j; // Insert the new element at the current index
+//             current_index_for_cyclic_stack = (current_index_for_cyclic_stack % p_bar) + 1;
+//         }
+//         // point_added = [point_added t]; %  record that we stored a point
+//     }
+// }
+
+// /* Concurrent learning error signal */
+// Vector3d concurrent_learning_Tau_ext; concurrent_learning_Tau_ext << 0,0,0;
+
+//     for (int j=1; j<= p_CL_idx; j++)
+//     {
+//         Vector3d Tau_j = Tau_stack.col(j); // jth delta from storage
+//         Matrix3d Phi_j = Phi_stack.col(j).reshaped(3,3); // jth phi matrix from storage
+//         Vector3d epsilon_Tau_ext = Phi_j*t.theta_hat - Tau_j;
+//         concurrent_learning_Tau_ext += Phi_j*epsilon_Tau_ext;  
+//     }

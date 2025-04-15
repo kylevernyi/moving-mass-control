@@ -7,9 +7,9 @@
 Vector3d ConvertMotorPositionToMassPosition(int32_t x, int32_t y, int32_t z)
 {
     // rotational, maps units of the stepper motor to radians
-    double x_rad = (double(x)-X_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES) * TAU * (1/STEPPER_STEPS_PER_REV) ; // (pos - initial) * 2pi radians / 200*step_mode  
-    double y_rad = (double(y)-Y_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES) * TAU * (1/STEPPER_STEPS_PER_REV) ; 
-    double z_rad = (double(z)-Z_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES) * TAU * (1/STEPPER_STEPS_PER_REV) ; 
+    double x_rad = (double(x)-X_OFFSET_FROM_LIMIT_SWITCH_WHOLE_PULSES*STEPPER_STEP_MODE_NUMERIC) * TAU * (1/STEPPER_STEPS_PER_REV) ; // (pos - initial) * 2pi radians / 200*step_mode  
+    double y_rad = (double(y)-Y_OFFSET_FROM_LIMIT_SWITCH_WHOLE_PULSES*STEPPER_STEP_MODE_NUMERIC) * TAU * (1/STEPPER_STEPS_PER_REV) ; 
+    double z_rad = (double(z)-Z_OFFSET_FROM_LIMIT_SWITCH_WHOLE_PULSES*STEPPER_STEP_MODE_NUMERIC) * TAU * (1/STEPPER_STEPS_PER_REV) ; 
 
     // radians to meters
     double x_pos =   x_rad * X_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000);  
@@ -31,9 +31,9 @@ std::vector<int32_t> ConvertMassPositionToMotorPosition(double x_pos, double y_p
     double z_rad = (z_pos - z_offset_from_cor) / (Z_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000)); // (z_pos) / (Z_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM / 1000));
 
     // Convert radians back to pulses
-    int32_t x = int32_t(x_rad * STEPPER_STEPS_PER_REV / TAU) + int32_t(X_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES);
-    int32_t y = int32_t(y_rad * STEPPER_STEPS_PER_REV / TAU) + int32_t(Y_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES);
-    int32_t z = int32_t(z_rad * STEPPER_STEPS_PER_REV / TAU) + int32_t(Z_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES);
+    int32_t x = int32_t(x_rad * STEPPER_STEPS_PER_REV / TAU) + int32_t(X_OFFSET_FROM_LIMIT_SWITCH_WHOLE_PULSES*STEPPER_STEP_MODE_NUMERIC);
+    int32_t y = int32_t(y_rad * STEPPER_STEPS_PER_REV / TAU) + int32_t(Y_OFFSET_FROM_LIMIT_SWITCH_WHOLE_PULSES*STEPPER_STEP_MODE_NUMERIC);
+    int32_t z = int32_t(z_rad * STEPPER_STEPS_PER_REV / TAU) + int32_t(Z_OFFSET_FROM_LIMIT_SWITCH_WHOLE_PULSES*STEPPER_STEP_MODE_NUMERIC);
 
     return std::vector<int32_t>{x,y,z};
 }

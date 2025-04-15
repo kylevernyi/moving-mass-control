@@ -3,7 +3,7 @@
 #include <Eigen/Dense>
 using namespace Eigen;
 
-#define KALMAN_RATE_HZ (100)
+#define KALMAN_RATE_HZ (100.0f)
 
 /* Noise characteristics */
 static const double SR = 100; // Maximum Sample Rate in Hz

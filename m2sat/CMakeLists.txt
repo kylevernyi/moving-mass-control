@@ -12,6 +12,7 @@ set(sources
     src/imu.cpp 
     src/tic.cpp
     src/motor_mapping.cpp   
+    src/log.cpp
     src/main.cpp)
 
 # Add module subdirectories

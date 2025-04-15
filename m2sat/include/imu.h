@@ -36,10 +36,10 @@ struct imu_data_vn_format_t
     void PullMeasurement(telemetry_t * tele) // fill our telemetry packet 
     {   
         // convert to Eigen quaternion
-        tele->q_b2i.w() = (quaternion.w); // shortest principle rotation correspondes to always positive first scalar component
-        tele->q_b2i.x() = quaternion.x;
-        tele->q_b2i.y() = quaternion.y;
-        tele->q_b2i.z() = quaternion.z;
+        tele->q_i2b.w() = (quaternion.w); // shortest principle rotation correspondes to always positive first scalar component
+        tele->q_i2b.x() = quaternion.x;
+        tele->q_i2b.y() = quaternion.y;
+        tele->q_i2b.z() = quaternion.z;
 
         // tele->q_b2i =  q_b2imu.inverse()*tele->q_b2i; 
         
@@ -65,3 +65,24 @@ struct imu_data_vn_format_t
 
 void ConnectAndConfigureIMU(imu_data_vn_format_t * imu_data, std::mutex * imu_mutex);
 void tare_heading();
+
+
+class LowPassFilter {
+public:
+    LowPassFilter(float alpha) : alpha_(alpha), initialized_(false), y_prev_(0.0f) {}
+
+    float update(float x) {
+        if (!initialized_) {
+            y_prev_ = x;  // Initialize with first input
+            initialized_ = true;
+        }
+        float y = alpha_ * x + (1.0f - alpha_) * y_prev_;
+        y_prev_ = y;
+        return y;
+    }
+
+private:
+    float alpha_;
+    float y_prev_;
+    bool initialized_;
+};

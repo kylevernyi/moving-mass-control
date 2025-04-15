@@ -16,13 +16,19 @@
 #include "kalman.h"
 #include "imu.h"
 #include "tic.h"
+#include "log.h"
 
-#define MAIN_LOOP_RATE_HZ (1000)
-#define ACTUATION_RATE_HZ (200)
 
+#define MAIN_LOOP_RATE_HZ (500.0f)
+#define ACTUATION_RATE_HZ (100.0f)
+#define LOGGING_RATE_HZ (100.0f)
+
+#define MOTOR_FEEDBACK_RATE_HZ (200.0f)
+
+void signalHandler(int signum);
+void MotorFeedbackLoop(telemetry_t * tele);
 void LoadGainsFromJSON();
 uint64_t getTimestamp();
-void signalHandler(int signum);
 void waitForKeyPress();
 
 /* IMU access variables */
@@ -36,6 +42,7 @@ zmq::socket_t telemetry_socket(context, zmq::socket_type::pub);
 /* Stepper motors */
 static const std::vector<uint8_t> tic_id = {100,101,102}; // x y z motor id in the firmware of the tic. must match!
 int stepper_i2c_fd;  // only 1 file descriptor for the i2c bus required 
+std::mutex stepper_mutex;
 
 bool kalman_filter_initialized = false;
 
@@ -50,13 +57,22 @@ int main()
     sigIntHandler.sa_flags = 0;
     sigaction(SIGINT, &sigIntHandler, nullptr);
 
+    /* Setup Logging */
+    std::ofstream log_file;
+    std::string filename = generateTimestampedFilename();
+    log_file.open(filename);
+    writeHeader(log_file);
+    
+
     /* Add clocks for loop timing*/
     ClockManager clockManager;
     const auto loopDuration = duration<float>(1.0f / MAIN_LOOP_RATE_HZ);
     clockManager.AddClock("controller", 1.0f / CONTROLLER_RATE_HZ);
-    clockManager.AddClock("kalman", 1.0f / KALMAN_RATE_HZ);
+    // clockManager.AddClock("kalman", 1.0f / KALMAN_RATE_HZ);
     clockManager.AddClock("telemetry", 1.0f / TELEMETRY_SEND_RATE_HZ);
+    clockManager.AddClock("logging", 1.0f / LOGGING_RATE_HZ);
     clockManager.AddClock("actuation", 1.0f / ACTUATION_RATE_HZ);
+    clockManager.AddClock("motor_feedback", 1.0f / MOTOR_FEEDBACK_RATE_HZ);
 
     /* Start IMU communication*/
     ConnectAndConfigureIMU(&imu_data, &imu_mutex);
@@ -67,7 +83,6 @@ int main()
     /* Data structure for telemetry */
     telemetry_t tele; // default initilziation to zeros already no need for memset zeros
     tele.r_mass << 0,0,0; // masses start at origin
-
 
     /* Load gains for controller from JSON*/
     LoadGainsFromJSON();
@@ -94,7 +109,8 @@ int main()
     /* Set inertia and initial estimate values for controller, can do other things in here for controller if desired */
     InitController();
 
-    while (true) {
+    while (true) 
+    {
         auto start = high_resolution_clock::now(); // timestamp
 
         /* update measurements by pulling most recent data from IMU */
@@ -104,21 +120,25 @@ int main()
 
             if (!kalman_filter_initialized)
             {
-                InitKalmanFilter(tele.omega_b2i_B, tele.q_b2i);
+                InitKalmanFilter(tele.omega_b2i_B, tele.q_i2b);
                 kalman_filter_initialized = true;
             }
         } 
         
         /* Get Mass Positions and Velocities from motor controllers */
-        int32_t motor_positions[3]; int32_t motor_velocities[3];
-        for (int i = 0; i<3; i++)
+        if (clockManager.Elapsed("motor_feedback").first)
         {
-            tic_get_current_position(stepper_i2c_fd, tic_id.at(i), &motor_positions[i]); // puts data into motor_positions
-            tic_get_current_velocity(stepper_i2c_fd, tic_id.at(i), &motor_velocities[i]); // puts data into motor_velocities
+            int32_t motor_positions[3]; int32_t motor_velocities[3];
+            for (int i = 0; i<3; i++)
+            {
+                tic_get_current_position(stepper_i2c_fd, tic_id.at(i), &motor_positions[i]); // puts data into motor_positions
+                tic_get_current_velocity(stepper_i2c_fd, tic_id.at(i), &motor_velocities[i]); // puts data into motor_velocities
+            }
+    
+            // Map shaft position and velocity to moving mass position and velocity
+            tele.r_mass = ConvertMotorPositionToMassPosition(motor_positions[0], motor_positions[1], motor_positions[2]);
+            tele.rdot_mass = ConvertMotorSpeedToMassVelocity(motor_velocities[0], motor_velocities[1], motor_velocities[2]);
         }
-        // Map shaft position and velocity to moving mass position and velocity
-        tele.r_mass = ConvertMotorPositionToMassPosition(motor_positions[0], motor_positions[1], motor_positions[2]);
-        tele.rdot_mass = ConvertMotorSpeedToMassVelocity(motor_velocities[0], motor_velocities[1], motor_velocities[2]);
 
         /* Run the controller */
         auto check_controller_clock = clockManager.Elapsed("controller");        
@@ -126,9 +146,7 @@ int main()
         {
             tele = Controller(tele, check_controller_clock.second.count());
             // tele = PD_Controller(tele,  check_controller_clock.second.count());
-            
-
-            tele.time = getTimestamp() - exp_start_time;
+            tele.time = getTimestamp() - exp_start_time; 
         }
 
         /* Actuate motors */
@@ -145,16 +163,20 @@ int main()
         }
 
         /* Send telemetry to groundstation */
-        if (clockManager.Elapsed("telemetry").first) 
+        auto check_tele_clock = clockManager.Elapsed("telemetry");        
+        if (check_tele_clock.first)
         {
             // Create and populate a telemetry message
             TelemetryMessage msg = toProto(tele); // Convert to Protobuf        
-            // Serialize to string
-            std::string serialized_msg;
-            msg.SerializeToString(&serialized_msg);
+            std::string serialized_msg; msg.SerializeToString(&serialized_msg); 
             zmq::message_t zmq_msg(serialized_msg.data(), serialized_msg.size());
             telemetry_socket.send(zmq_msg, zmq::send_flags::none);
-            tele.Disp();
+            // tele.Disp();
+        }
+
+        if (clockManager.Elapsed("logging").first)
+        {
+            LogTele(log_file, tele);
         }
         
         /* Loop timing business */
@@ -179,6 +201,7 @@ void signalHandler(int signum) {
     std::exit(signum);
 }
 
+
 Matrix3d loadMatrix(const nlohmann::json& j) {
     Matrix3d mat;
     for (int i = 0; i < 3; ++i) {
@@ -199,6 +222,8 @@ void LoadGainsFromJSON()
         loadMatrix(j["gamma_gain"]), loadMatrix(j["CL_gain"]), loadMatrix(j["adaptive_gain"]));
 }
 
+
+
 uint64_t getTimestamp()
 {
     // Get the current time point from the system clock
@@ -210,6 +235,7 @@ uint64_t getTimestamp()
 
     return static_cast<uint64_t>(milliseconds);
 }
+
 
 void setNonBlockingInput() {
     struct termios newt;

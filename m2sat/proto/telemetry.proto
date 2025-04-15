@@ -3,7 +3,7 @@ syntax = "proto3";
 message TelemetryMessage {
     uint64 time = 1;
     repeated double omega_b2i = 2 [packed = true]; // x y z omega
-    repeated double q_b2i = 3 [packed = true]; // pose quaternion
+    repeated double q_i2b = 3 [packed = true]; // pose quaternion
     repeated double q_i2d = 4 [packed = true]; // desired quaternion
     repeated double r_mass = 5  [packed = true]; //mass postion
     repeated double rdot_mass = 6  [packed = true]; // mass velocity
@@ -13,5 +13,6 @@ message TelemetryMessage {
     repeated double nu_top = 10 [packed = true]; // kalman filter estimate 3x1
     repeated double nu_bottom = 11 [packed = true]; // kalman filter estimate 3x1
     repeated double theta_hat = 12 [packed = true]; // mass offset estimate
+    repeated double omega_d2i_D = 13 [packed = true]; // trajectory design term
 }
 

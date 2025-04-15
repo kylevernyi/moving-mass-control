@@ -11,7 +11,7 @@
 #include "kalman.h"
 #include "telemetry.h"
 
-#define CONTROLLER_RATE_HZ (200)
+#define CONTROLLER_RATE_HZ (200.0f)
 
 static const int CL_turn_on = 10; // wait until this many points are in nu to turn on CL
 
@@ -54,7 +54,7 @@ static const Matrix3d J_B = (Matrix3d() <<
     J_xz_B, J_yz_B, Jzz_B).finished();
 static Matrix3d J_P; // principal moi
 
-static const double M = 6.7; // Simulator mass kg
+static const double M = 6.70f + 0.800f; // Simulator mass kg
 static const double m_x = 2*260*1e-3; // Actuator masses kg
 static const double m_y = 2*260*1e-3; // Actuator masses kg
 static const double m_z = 268*1e-3; // Actuator masses kg
@@ -67,6 +67,13 @@ static const double m_x_max_pos_meters =  (93.0f - 60.0f/2.0f)*1e-3    - 10*1e-3
 static const double m_y_max_pos_meters =  (93.0f - 60.0f/2.0f)*1e-3    - 10*1e-3   ; // 93mm to center of mass from limit switch (roughly), then substract half of the width of the mass so it doesnt bump switch 
 static const double m_z_max_pos_meters = -((85.8+97.75)-70.0f/2.0f)*1e-3; // farthest from bottom plat
 static const double m_z_min_pos_meters = -(85.8+ 70.0f/2.0f)*1e-3; // closest to bottom plate we can get. 71 = distance from CoR to limit switch trigger point
+
+static const double u_com_max_x  =  160.6878 * (1e-3);
+static const double u_com_max_y  =  160.6878 * (1e-3);
+static const double u_com_max_z  =  256.9926 * (1e-3);
+
+static const Vector3d theta_hat_min = (Vector3d() << -0.1, -0.1, -0.1).finished();
+static const Vector3d theta_hat_max = (Vector3d() << 0.1, 0.1, 0.3).finished();
 
 static const Vector3d g_I = (Vector3d() << 0,0,9.81).finished(); // % Gravity vector
 

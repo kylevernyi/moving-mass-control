@@ -43,7 +43,7 @@ inline telemetry_t fromProto(const TelemetryMessage& proto) {
     {
 
         proto.time(),
-        fromProtoQuaterniond(proto.q_b2i()),
+        fromProtoQuaterniond(proto.q_i2b()),
         fromProtoQuaterniond(proto.q_i2d()),
         fromProtoVector3d(proto.omega_b2i()),
         fromProtoVector3d(proto.r_mass()),
@@ -52,7 +52,9 @@ inline telemetry_t fromProto(const TelemetryMessage& proto) {
         fromProtoVector3d(proto.u_com()),
         fromProtoVector3d(proto.u_actual()),
         nu_vec,
-        fromProtoVector3d(proto.theta_hat())
+        fromProtoVector3d(proto.theta_hat()),
+        fromProtoVector3d(proto.omega_d2i_d())
+        
     };
 }
 
@@ -60,7 +62,7 @@ inline telemetry_t fromProto(const TelemetryMessage& proto) {
 inline TelemetryMessage toProto(const telemetry_t& t) {
     TelemetryMessage proto;
     proto.set_time(t.time);
-    toProtoQuaterniond(t.q_b2i, proto.mutable_q_b2i());
+    toProtoQuaterniond(t.q_i2b, proto.mutable_q_i2b());
     toProtoQuaterniond(t.q_i2d, proto.mutable_q_i2d());
     toProtoVector3d(t.omega_b2i_B, proto.mutable_omega_b2i());
     toProtoVector3d(t.r_mass, proto.mutable_r_mass());
@@ -76,6 +78,7 @@ inline TelemetryMessage toProto(const telemetry_t& t) {
         proto.mutable_nu_bottom()->Add(0); proto.mutable_nu_bottom()->Add(0); proto.mutable_nu_bottom()->Add(0); 
     }
     toProtoVector3d(t.theta_hat, proto.mutable_theta_hat());
+    toProtoVector3d(t.omega_d2i_d, proto.mutable_omega_d2i_d());
 
     return proto;
 }

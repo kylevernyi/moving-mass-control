@@ -175,7 +175,7 @@ class TelemetryMessage final :
 
   enum : int {
     kOmegaB2IFieldNumber = 2,
-    kQB2IFieldNumber = 3,
+    kQI2BFieldNumber = 3,
     kQI2DFieldNumber = 4,
     kRMassFieldNumber = 5,
     kRdotMassFieldNumber = 6,
@@ -185,6 +185,7 @@ class TelemetryMessage final :
     kNuTopFieldNumber = 10,
     kNuBottomFieldNumber = 11,
     kThetaHatFieldNumber = 12,
+    kOmegaD2IDFieldNumber = 13,
     kTimeFieldNumber = 1,
   };
   // repeated double omega_b2i = 2 [packed = true];
@@ -209,27 +210,27 @@ class TelemetryMessage final :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
       mutable_omega_b2i();
 
-  // repeated double q_b2i = 3 [packed = true];
-  int q_b2i_size() const;
+  // repeated double q_i2b = 3 [packed = true];
+  int q_i2b_size() const;
   private:
-  int _internal_q_b2i_size() const;
+  int _internal_q_i2b_size() const;
   public:
-  void clear_q_b2i();
+  void clear_q_i2b();
   private:
-  double _internal_q_b2i(int index) const;
+  double _internal_q_i2b(int index) const;
   const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
-      _internal_q_b2i() const;
-  void _internal_add_q_b2i(double value);
+      _internal_q_i2b() const;
+  void _internal_add_q_i2b(double value);
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
-      _internal_mutable_q_b2i();
+      _internal_mutable_q_i2b();
   public:
-  double q_b2i(int index) const;
-  void set_q_b2i(int index, double value);
-  void add_q_b2i(double value);
+  double q_i2b(int index) const;
+  void set_q_i2b(int index, double value);
+  void add_q_i2b(double value);
   const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
-      q_b2i() const;
+      q_i2b() const;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
-      mutable_q_b2i();
+      mutable_q_i2b();
 
   // repeated double q_i2d = 4 [packed = true];
   int q_i2d_size() const;
@@ -429,6 +430,28 @@ class TelemetryMessage final :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
       mutable_theta_hat();
 
+  // repeated double omega_d2i_D = 13 [packed = true];
+  int omega_d2i_d_size() const;
+  private:
+  int _internal_omega_d2i_d_size() const;
+  public:
+  void clear_omega_d2i_d();
+  private:
+  double _internal_omega_d2i_d(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+      _internal_omega_d2i_d() const;
+  void _internal_add_omega_d2i_d(double value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+      _internal_mutable_omega_d2i_d();
+  public:
+  double omega_d2i_d(int index) const;
+  void set_omega_d2i_d(int index, double value);
+  void add_omega_d2i_d(double value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+      omega_d2i_d() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+      mutable_omega_d2i_d();
+
   // uint64 time = 1;
   void clear_time();
   uint64_t time() const;
@@ -447,7 +470,7 @@ class TelemetryMessage final :
   typedef void DestructorSkippable_;
   struct Impl_ {
     ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > omega_b2i_;
-    ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > q_b2i_;
+    ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > q_i2b_;
     ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > q_i2d_;
     ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > r_mass_;
     ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > rdot_mass_;
@@ -457,6 +480,7 @@ class TelemetryMessage final :
     ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > nu_top_;
     ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > nu_bottom_;
     ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > theta_hat_;
+    ::PROTOBUF_NAMESPACE_ID::RepeatedField< double > omega_d2i_d_;
     uint64_t time_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
@@ -541,51 +565,51 @@ TelemetryMessage::mutable_omega_b2i() {
   return _internal_mutable_omega_b2i();
 }
 
-// repeated double q_b2i = 3 [packed = true];
-inline int TelemetryMessage::_internal_q_b2i_size() const {
-  return _impl_.q_b2i_.size();
+// repeated double q_i2b = 3 [packed = true];
+inline int TelemetryMessage::_internal_q_i2b_size() const {
+  return _impl_.q_i2b_.size();
 }
-inline int TelemetryMessage::q_b2i_size() const {
-  return _internal_q_b2i_size();
+inline int TelemetryMessage::q_i2b_size() const {
+  return _internal_q_i2b_size();
 }
-inline void TelemetryMessage::clear_q_b2i() {
-  _impl_.q_b2i_.Clear();
+inline void TelemetryMessage::clear_q_i2b() {
+  _impl_.q_i2b_.Clear();
 }
-inline double TelemetryMessage::_internal_q_b2i(int index) const {
-  return _impl_.q_b2i_.Get(index);
+inline double TelemetryMessage::_internal_q_i2b(int index) const {
+  return _impl_.q_i2b_.Get(index);
 }
-inline double TelemetryMessage::q_b2i(int index) const {
-  // @@protoc_insertion_point(field_get:TelemetryMessage.q_b2i)
-  return _internal_q_b2i(index);
+inline double TelemetryMessage::q_i2b(int index) const {
+  // @@protoc_insertion_point(field_get:TelemetryMessage.q_i2b)
+  return _internal_q_i2b(index);
 }
-inline void TelemetryMessage::set_q_b2i(int index, double value) {
-  _impl_.q_b2i_.Set(index, value);
-  // @@protoc_insertion_point(field_set:TelemetryMessage.q_b2i)
+inline void TelemetryMessage::set_q_i2b(int index, double value) {
+  _impl_.q_i2b_.Set(index, value);
+  // @@protoc_insertion_point(field_set:TelemetryMessage.q_i2b)
 }
-inline void TelemetryMessage::_internal_add_q_b2i(double value) {
-  _impl_.q_b2i_.Add(value);
+inline void TelemetryMessage::_internal_add_q_i2b(double value) {
+  _impl_.q_i2b_.Add(value);
 }
-inline void TelemetryMessage::add_q_b2i(double value) {
-  _internal_add_q_b2i(value);
-  // @@protoc_insertion_point(field_add:TelemetryMessage.q_b2i)
-}
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
-TelemetryMessage::_internal_q_b2i() const {
-  return _impl_.q_b2i_;
+inline void TelemetryMessage::add_q_i2b(double value) {
+  _internal_add_q_i2b(value);
+  // @@protoc_insertion_point(field_add:TelemetryMessage.q_i2b)
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
-TelemetryMessage::q_b2i() const {
-  // @@protoc_insertion_point(field_list:TelemetryMessage.q_b2i)
-  return _internal_q_b2i();
+TelemetryMessage::_internal_q_i2b() const {
+  return _impl_.q_i2b_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+TelemetryMessage::q_i2b() const {
+  // @@protoc_insertion_point(field_list:TelemetryMessage.q_i2b)
+  return _internal_q_i2b();
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
-TelemetryMessage::_internal_mutable_q_b2i() {
-  return &_impl_.q_b2i_;
+TelemetryMessage::_internal_mutable_q_i2b() {
+  return &_impl_.q_i2b_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
-TelemetryMessage::mutable_q_b2i() {
-  // @@protoc_insertion_point(field_mutable_list:TelemetryMessage.q_b2i)
-  return _internal_mutable_q_b2i();
+TelemetryMessage::mutable_q_i2b() {
+  // @@protoc_insertion_point(field_mutable_list:TelemetryMessage.q_i2b)
+  return _internal_mutable_q_i2b();
 }
 
 // repeated double q_i2d = 4 [packed = true];
@@ -1009,6 +1033,53 @@ inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
 TelemetryMessage::mutable_theta_hat() {
   // @@protoc_insertion_point(field_mutable_list:TelemetryMessage.theta_hat)
   return _internal_mutable_theta_hat();
+}
+
+// repeated double omega_d2i_D = 13 [packed = true];
+inline int TelemetryMessage::_internal_omega_d2i_d_size() const {
+  return _impl_.omega_d2i_d_.size();
+}
+inline int TelemetryMessage::omega_d2i_d_size() const {
+  return _internal_omega_d2i_d_size();
+}
+inline void TelemetryMessage::clear_omega_d2i_d() {
+  _impl_.omega_d2i_d_.Clear();
+}
+inline double TelemetryMessage::_internal_omega_d2i_d(int index) const {
+  return _impl_.omega_d2i_d_.Get(index);
+}
+inline double TelemetryMessage::omega_d2i_d(int index) const {
+  // @@protoc_insertion_point(field_get:TelemetryMessage.omega_d2i_D)
+  return _internal_omega_d2i_d(index);
+}
+inline void TelemetryMessage::set_omega_d2i_d(int index, double value) {
+  _impl_.omega_d2i_d_.Set(index, value);
+  // @@protoc_insertion_point(field_set:TelemetryMessage.omega_d2i_D)
+}
+inline void TelemetryMessage::_internal_add_omega_d2i_d(double value) {
+  _impl_.omega_d2i_d_.Add(value);
+}
+inline void TelemetryMessage::add_omega_d2i_d(double value) {
+  _internal_add_omega_d2i_d(value);
+  // @@protoc_insertion_point(field_add:TelemetryMessage.omega_d2i_D)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+TelemetryMessage::_internal_omega_d2i_d() const {
+  return _impl_.omega_d2i_d_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >&
+TelemetryMessage::omega_d2i_d() const {
+  // @@protoc_insertion_point(field_list:TelemetryMessage.omega_d2i_D)
+  return _internal_omega_d2i_d();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+TelemetryMessage::_internal_mutable_omega_d2i_d() {
+  return &_impl_.omega_d2i_d_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< double >*
+TelemetryMessage::mutable_omega_d2i_d() {
+  // @@protoc_insertion_point(field_mutable_list:TelemetryMessage.omega_d2i_D)
+  return _internal_mutable_omega_d2i_d();
 }
 
 #ifdef __GNUC__

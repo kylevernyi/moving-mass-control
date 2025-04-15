@@ -48,15 +48,24 @@ void ConnectAndConfigureIMU(imu_data_vn_format_t * imu_data, std::mutex * imu_mu
     // const vn::math::mat3f R_imu2principal = R_body2principal * (R_imu2body_z * R_imu2body_y);
 
 	vs.writeReferenceFrameRotation(R_imu2body_y, true);
-	vs.writeSettings(true); 
 
     /* Indoor mode for heading */
     VpeBasicControlRegister vpeReg = vs.readVpeBasicControl();
     vpeReg.headingMode = HEADINGMODE_INDOOR;
+    vpeReg.filteringMode = VPEMODE_MODE1;
     vs.writeVpeBasicControl(vpeReg);
+    
+    VpeAccelerometerBasicTuningRegister vpeAccReg = vs.readVpeAccelerometerBasicTuning();
+    vpeAccReg.adaptiveFiltering.x = 10; // 10 is max, 5 is default. higher seems better to kill vibrations from masses
+    vpeAccReg.adaptiveFiltering.y = 10; // 10 is max, 5 is default. higher seems better to kill vibrations from masses
+    vpeAccReg.adaptiveFiltering.z = 10; // 10 is max, 5 is default. higher seems better to kill vibrations from masses
+    vs.writeVpeAccelerometerBasicTuning(vpeAccReg);
 
     vs.writeAsyncDataOutputFrequency(VN_IMU_UPDATE_HZ); // set output frequency
 	uint32_t newHz = vs.readAsyncDataOutputFrequency();
+
+	vs.writeSettings(true); 
+
 
     vs.writeAsyncDataOutputType(imu_connection_mode); // set data output format, false = dont wait for reply
     vs.registerAsyncPacketReceivedHandler((void *) imu_data, asciiAsyncMessageReceived); // register callback function
@@ -87,10 +96,19 @@ void asciiAsyncMessageReceived(void* imu_struct, Packet& p, size_t index)
             // p.parseVNQMR(&imu_ptr->quaternion, &imu_ptr->magnetic, &imu_ptr->acceleration, &imu_ptr->angularRate);
             p.parseVNQTR(&imu_ptr->quaternion, &imu_ptr->angularRate);
 
+            LowPassFilter omega[3] = {0.1, 0.1, 0.1};
+
             imu_output_ptr->quaternion = imu_ptr->quaternion;
             // imu_output_ptr->magnetic = imu_ptr->magnetic;
             // imu_output_ptr->acceleration = imu_ptr->acceleration;
-            imu_output_ptr->angularRate = imu_ptr->angularRate;
+            vec3f output;
+
+            output.x = omega[0].update(imu_ptr->angularRate.x);
+            output.y = omega[1].update(imu_ptr->angularRate.y);
+            output.z = omega[2].update(imu_ptr->angularRate.z);
+            
+
+            imu_output_ptr->angularRate = output; //imu_ptr->angularRate;
 
 
             imu_output_ptr->valid_data = true;

@@ -110,7 +110,9 @@ int tic_get_current_velocity(int fd, uint8_t address, int32_t * output)
 {
     *output = 0;
     uint8_t buffer[4];
+    
     int result = tic_get_variable(fd, address, ADDR_CURRENT_VELOCITY, buffer, sizeof(buffer));
+    
     if (result) { return -1; }
     *output = buffer[0] + ((uint32_t)buffer[1] << 8) +
     ((uint32_t)buffer[2] << 16) + ((uint32_t)buffer[3] << 24);
@@ -296,7 +298,7 @@ int SetTicSettings(int fd, uint8_t address)
     tic_set_max_deccel(fd, address, STEPPER_MAX_DECELL_PPS2*PPS2_UNIT_CONVERSION);
     tic_set_max_speed(fd, address, STEPPER_MAX_PULSES_PER_SEC*PPS_UNIT_CONVERSION);
     tic_set_starting_speed(fd,address, STEPPER_START_SPEED_PPS*PPS_UNIT_CONVERSION);
-    tic_set_step_mode(fd, address, STEPPER_STEP_MODE);
+    tic_set_step_mode(fd, address, 2);
     
     if (address != 102) {    
         tic_go_home(fd, address, 0);
@@ -309,8 +311,11 @@ int SetTicSettings(int fd, uint8_t address)
     while (flags.bits.positionUncertain == true) // wait till we get home
     {
         flags = tic_get_misc_flags(fd, address);
+        
+
         std::this_thread::sleep_for(std::chrono::milliseconds(15));
     }
+    tic_set_step_mode(fd, address, STEPPER_STEP_MODE);
 
     std::cout << "Configured Tic: " << int(address) << std::endl;
     return 0;
@@ -318,8 +323,8 @@ int SetTicSettings(int fd, uint8_t address)
 
 int SendAllTicsHome(int fd, const uint8_t *addresses)
 {
-    tic_set_target_position(fd, 100, int32_t(X_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES));
-    tic_set_target_position(fd, 101, int32_t(Y_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES));
-    tic_set_target_position(fd, 102, int32_t(Z_OFFSET_FROM_LIMIT_SWITCH_HALF_PULSES));
+    tic_set_target_position(fd, 100, int32_t(X_OFFSET_FROM_LIMIT_SWITCH_WHOLE_PULSES * STEPPER_STEP_MODE_NUMERIC));
+    tic_set_target_position(fd, 101, int32_t(Y_OFFSET_FROM_LIMIT_SWITCH_WHOLE_PULSES * STEPPER_STEP_MODE_NUMERIC));
+    tic_set_target_position(fd, 102, int32_t(Z_OFFSET_FROM_LIMIT_SWITCH_WHOLE_PULSES * STEPPER_STEP_MODE_NUMERIC));
     return 0;
 }
