@@ -344,11 +344,12 @@ if (whole_timestep && integration_phase)
 
     u_com_local = u_com(:,w_iter); % for zero order hold
 % u = [-1.54; 43.367; -25.11]
-u = [100; 0; 0];
+% u = [100; 0; 0];
     % Transformation of u_com to Commanded Positions as in ref[DOI: 10.2514/1.60380]
     r_com(:,w_iter) = m\(cross(g_B, u)/(norm(g_B)^2)); % commanded mass positions
     r_com_local = r_com(:,w_iter); % commanded mass positions
 end
+u_actual = m * cross(g_B, r_masses);
 
 %% Concurrent learning data selection algorithm
 % Initialize concurrent learning persistent variables 
@@ -407,7 +408,7 @@ end
 %%  Dynamics
 
 q_i2b_dot = 0.5*quat_mult(q_i2b,[0;omega_b2i_B]); % q_dot of BFF w.r. to Inertial Frame
-omega_b2i_B_dot = J\(-JB_m_dot*omega_b2i_B - cross(omega_b2i_B,J*omega_b2i_B) + Phi*theta + u_com_local) + sqrtm(Q(1:3,1:3))*randn(3,1)*0; % Omega_dot Body w.r. Inertial in Body Frame
+omega_b2i_B_dot = J\(-JB_m_dot*omega_b2i_B - cross(omega_b2i_B,J*omega_b2i_B) + Phi*theta + u_actual) + sqrtm(Q(1:3,1:3))*randn(3,1)*0; % Omega_dot Body w.r. Inertial in Body Frame
 q_i2d_dot = 0.5*quat_mult(q_i2d,[0;omega_d2i_D]); % q_dot of DF w.r. to Inertial Frame
 theta_hat_dot = gamma* ( (Phi'*r)  + CL_on*CL_gain*concurrent_learning_Tau_ext); %  Adaptive update law
 r_masses_dot = 2*pi*motor_bandwidth_hz * (r_com_local - r_masses); % first order actuator dynamics (lambda * (setpoint - current)

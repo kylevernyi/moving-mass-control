@@ -3,20 +3,25 @@
 
 cmake_minimum_required(VERSION 3.5)
 
+# If CMAKE_DISABLE_SOURCE_CHANGES is set to true and the source directory is an
+# existing directory in our source tree, calling file(MAKE_DIRECTORY) on it
+# would cause a fatal error, even though it would be a no-op.
+if(NOT EXISTS "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-src")
+  file(MAKE_DIRECTORY "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-src")
+endif()
 file(MAKE_DIRECTORY
-  "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-src"
-  "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-build"
-  "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix"
-  "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/tmp"
-  "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp"
-  "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src"
-  "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp"
+  "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-build"
+  "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix"
+  "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/tmp"
+  "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp"
+  "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src"
+  "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp"
 )
 
 set(configSubDirs )
 foreach(subDir IN LISTS configSubDirs)
-    file(MAKE_DIRECTORY "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/${subDir}")
+    file(MAKE_DIRECTORY "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp/${subDir}")
 endforeach()
 if(cfgdir)
-  file(MAKE_DIRECTORY "/home/bode/moving-mass-control/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp${cfgdir}") # cfgdir has leading slash
+  file(MAKE_DIRECTORY "/home/kyle/school/s25/mmc/m2sat/build/_deps/catch2-subbuild/catch2-populate-prefix/src/catch2-populate-stamp${cfgdir}") # cfgdir has leading slash
 endif()

@@ -427,6 +427,7 @@ elseif t == 138.5
 elseif h == 2 && t < T_trans + 300
     omega_d2i_D = omega_d2i_D + [0;-rot_trans*pi/(2*T_trans)*sin(pi/T_trans*(t-300));0];
 end
+
 %
 %omega_dot_d2i_I = [-A*b*sin(b*t);0;0];
 omega_dot_d2i_D = [0;0*A*exp(-f*t)*(f*sin(b*t) - b*cos(b*t));0];
@@ -463,7 +464,7 @@ Phi = -M*g_b_x;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Control Torque as Designed by Lyapunov Analysis
-P = (eye(3)-(g_B*g_B')/(norm(g_B)^2));
+P = eye(3)-(g_B*g_B')/(norm(g_B)^2);
 u_com = P*cross(omega_b2i_B,J*omega_b2i_B) - P*Phi*theta_hat...
     + J*P*(omega_dot_d2i_B + cross(omega_d2i_B,omega_b2d_B)...
     - 0.5*alpha*(skew(q_d2b(2:4)) + q_d2b(1)*eye(3))*omega_b2d_B)...
@@ -487,14 +488,14 @@ u_com = P*cross(omega_b2i_B,J*omega_b2i_B) - P*Phi*theta_hat...
 %det(P*diag(theta_hat.^2))
 
 %u_com = P*u_com;
-u_com_check = quat_mult(quat_mult(q_i2b,[0;u_com]),quat_conj(q_i2b))
+u_com_check = quat_mult(quat_mult(q_i2b,[0;u_com]),quat_conj(q_i2b));
 %u_com_check(4) = 0;
 %u_com = quat_mult(quat_mult(quat_conj(q_i2b),u_com_check),q_i2b);
 %u_com = u_com(2:4);
 % Transformation of u_com to Commanded Positions as in ref[DOI: 10.2514/1.60380]
 r_com = m\(cross(g_B,u_com)/(norm(g_B)^2));
 % Real control applied to the system w/ moving masses
-u = m*(cross(-g_B,r_com))
+u = m*(cross(-g_B,r_com));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Define first order ODE's 
 % q_dot of BFF w.r. to Inertial Frame
