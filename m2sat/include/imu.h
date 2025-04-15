@@ -65,3 +65,24 @@ struct imu_data_vn_format_t
 
 void ConnectAndConfigureIMU(imu_data_vn_format_t * imu_data, std::mutex * imu_mutex);
 void tare_heading();
+
+
+class LowPassFilter {
+public:
+    LowPassFilter(float alpha) : alpha_(alpha), initialized_(false), y_prev_(0.0f) {}
+
+    float update(float x) {
+        if (!initialized_) {
+            y_prev_ = x;  // Initialize with first input
+            initialized_ = true;
+        }
+        float y = alpha_ * x + (1.0f - alpha_) * y_prev_;
+        y_prev_ = y;
+        return y;
+    }
+
+private:
+    float alpha_;
+    float y_prev_;
+    bool initialized_;
+};

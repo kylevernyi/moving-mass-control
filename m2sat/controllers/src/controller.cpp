@@ -18,7 +18,8 @@ Vector3d quat_rotate(const Quaterniond& q, const Vector3d& v);
 Matrix3d skew(const Vector3d& v);
 Quaterniond quat_mult(const Quaterniond& q, const Quaterniond& p);
 int rank(MatrixXd mat);
-
+Vector3d projected_update(const Vector3d& theta_hat, const Matrix3d& Phi, Vector3d r,
+    const Vector3d& theta_hat_min_, const Vector3d& theta_hat_max_); // PROJ
 
 int SetGains(Matrix3d K_1_, Matrix3d K_2_, Matrix3d K_3_, Matrix3d K_4_, Matrix3d alpha_1_, Matrix3d alpha_2_, Matrix3d gamma_gain_, Matrix3d CL_gain_, Matrix3d adaptive_gain_)
 {
@@ -104,27 +105,45 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     controller_output.omega_d2i_d = quat_rotate(t.q_i2d.conjugate(), omega_d2i_I); //  quat_mult(quat_mult(quat_conj(q_i2d),[0;omega_d2i_I]),q_i2d);
 
     /* Trajectory Design */
-    static const double T_trans = 30.0f; // how long manuever takes
-    static const double T_offset = 10.0f; // when it starts
+    static const double T_start = 15.0f; // when it starts
+
+    static const double T_trans = 15.0f; // half as long as it takes manuever takes to get to full pitch 
+    static const double T_offset =  T_trans + T_start; 
+
+    static const double T_begin_second_dip = T_offset + 20.0f;
+    static const double T_offset_2 = T_begin_second_dip + T_trans; 
 
     static const double rot_trans = M_PI/12.0f;
-    if (t.time*1e-3 < T_trans + T_offset)
+    if (t.time*1e-3 < T_start)
     {
-        Vector3d added_desired_term; added_desired_term <<  0, 
-            rot_trans*M_PI/(2*T_trans)*sin(M_PI/T_trans*(t.time*1e-3 )),
-            0;
-            // std::cout << "added_term 1"  << added_desired_term.transpose() << std::endl;
-        // controller_output.omega_d2i_d += added_desired_term;
-        // std::cout << controller_output.q_i2d.coeffs().transpose() << std::endl;
+        // do nothing to desired trajectory
+        std::cout << "Initial Level" << std::endl;
     }
-    else if (t.time*1e-3 >= T_trans + T_offset)
+    else if (t.time*1e-3 >= T_start && (t.time*1e-3 <  T_offset)) // in the time for the first dip
+    {
+        Vector3d added_desired_term; added_desired_term <<  
+            0, 
+            rot_trans*M_PI/(2*T_trans)*sin(M_PI/T_trans*(t.time*1e-3 - T_start)),
+            0;
+        controller_output.omega_d2i_d += added_desired_term;
+        std::cout << "Dip 1" << std::endl;
+    }
+    else if (t.time*1e-3 >= T_offset && t.time*1e-3 < T_begin_second_dip)  // stabilize to origin for this long
+    {
+        // do nothing to desired trajectory
+        std::cout << "Pitched up" << std::endl;
+    }
+    else if (t.time*1e-3 >= T_begin_second_dip && t.time*1e-3 < T_begin_second_dip+T_trans) // in the time 
     {
         Vector3d added_desired_term;  
         added_desired_term << 0,
-            -rot_trans*M_PI/(2*T_trans)*sin(M_PI/T_trans*(t.time*1e-3)), 
+            -rot_trans*M_PI/(2*T_trans)*sin(M_PI/T_trans*(t.time*1e-3 - T_begin_second_dip)), 
             0;
-        std::cout << "added_term 2"  << added_desired_term.transpose() << std::endl;
-        // controller_output.omega_d2i_d += added_desired_term;
+        controller_output.omega_d2i_d += added_desired_term;
+        std::cout << "Dip 2 back down" << std::endl;
+    } else if (t.time*1e-3 >= T_begin_second_dip+T_trans)
+    {
+        std::cout << "Finished" << std::endl;
     }
     
 
@@ -167,10 +186,9 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
         + K_4*skew(omega_d2i_B)*omega_b2d_B 
         - 0.5*alpha_1*(skew(q_d2b.vec()) + q_d2b.w()*Matrix3d::Identity())*omega_b2d_B); // desired torque 
 
-    std::cout << "Projection Operator: \n" << Proj_operator << std::endl;
 
     std::cout << "alpha_2 Error term: " << (alpha_2*q_d2b.vec()).transpose() << std::endl;
-    std::cout << "K_1 term: " << (-K_1*Jm_B_dot*(0.5*r - t.omega_b2i_B)).transpose() << std::endl;
+    // std::cout << "K_1 term: " << (-K_1*Jm_B_dot*(0.5*r - t.omega_b2i_B)).transpose() << std::endl;
     std::cout << "K_2 Derivative term: " << (K_2*skew(t.omega_b2i_B)*J*t.omega_b2i_B).transpose() << std::endl;
     std::cout << "K_3 Error term: " << (-K_3*r).transpose() << std::endl;
     std::cout << "K_4 Derivative term: " << ( K_4*skew(omega_d2i_B)*omega_b2d_B).transpose() << std::endl;
@@ -206,7 +224,10 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     controller_output.q_i2d.normalize();
 
     /* Update law */
-    Vector3d theta_hat_dot = gamma_gain * (Phi.transpose()*r) ; //+ CL_on*CL_gain*concurrent_learning_Tau_ext); //  Adaptive update law
+    // Vector3d theta_hat_dot = gamma_gain * (Phi.transpose()*r) ; //+ CL_on*CL_gain*concurrent_learning_Tau_ext); //  Adaptive update law
+    Vector3d theta_hat_dot =  projected_update(controller_output.theta_hat, Phi, r,
+        theta_hat_min,  theta_hat_max);
+
     // std::cout << "hat dot" << theta_hat_dot.transpose() << std::endl;
     controller_output.theta_hat += theta_hat_dot*dt_seconds; 
 
@@ -303,6 +324,29 @@ int rank(MatrixXd mat)
     double tol = 1e-6 * svd.singularValues().array().abs()(0);  // Tolerance based on largest singular value
     int rank_ = (svd.singularValues().array() > tol).count();
     return rank_;
+}
+
+// Projection operator 
+Vector3d projected_update(const Vector3d& theta_hat, const Matrix3d& Phi, Vector3d r,
+    const Vector3d& theta_hat_min_, const Vector3d& theta_hat_max_)
+{
+    Vector3d theta_hat_dot = gamma_gain * Phi.transpose() * r;
+
+    for (int i = 0; i < theta_hat.size(); ++i)
+    {
+        // If at lower bound and trying to decrease, block update
+        if (theta_hat(i) <= theta_hat_min(i) && theta_hat_dot(i) < 0)
+        {
+            theta_hat_dot(i) = 0;
+        }
+        // If at upper bound and trying to increase, block update
+        else if (theta_hat(i) >= theta_hat_max(i) && theta_hat_dot(i) > 0)
+        {
+            theta_hat_dot(i) = 0;
+        }
+    }
+
+    return theta_hat_dot;
 }
 
 // /* Concurrent learning data selection algorithm */

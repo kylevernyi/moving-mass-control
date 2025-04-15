@@ -72,6 +72,9 @@ static const double u_com_max_x  =  160.6878 * (1e-3);
 static const double u_com_max_y  =  160.6878 * (1e-3);
 static const double u_com_max_z  =  256.9926 * (1e-3);
 
+static const Vector3d theta_hat_min = (Vector3d() << -0.1, -0.1, -0.1).finished();
+static const Vector3d theta_hat_max = (Vector3d() << 0.1, 0.1, 0.3).finished();
+
 static const Vector3d g_I = (Vector3d() << 0,0,9.81).finished(); // % Gravity vector
 
 /* Main controller functions */
