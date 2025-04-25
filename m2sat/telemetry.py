@@ -27,9 +27,9 @@ PLOT_CONFIGS = [
         'ylim': [-np.pi, np.pi]
     },
     {
-        'overlay_pair': ('q_i2b', 'q_i2d'),
+        'overlay_pair': ('q_b2i', 'q_i2d'),
         'channels': 4,
-        'title': 'Body (q_i2b) and Desired (q_i2d) Quat',
+        'title': 'Body (q_b2i) and Desired (q_i2d) Quat',
         'overlay': None,
         'ylim': [-1.1, 1.1]
     },
@@ -72,7 +72,7 @@ PLOT_CONFIGS = [
 CSV_FIELDS = [
     ('time', 1),
     ('omega_b2i', 3),
-    ('q_i2b', 4),
+    ('q_b2i', 4),
     ('q_i2d', 4),
     ('r_mass', 3),
     ('rdot_mass', 3),
@@ -104,7 +104,7 @@ class MultiTelemetryPlotter:
         self.data = {'time': []}
         # For fields that are single (non-overlay) store as: data[field] = [[], [], ...]
         # For overlay pairs, we'll store both separately.
-        self.fields = ['omega_b2i', 'q_i2b', 'q_i2d', 'rdot_mass', 'theta_hat', 'omega_d2i_D']
+        self.fields = ['omega_b2i', 'q_b2i', 'q_i2d', 'rdot_mass', 'theta_hat', 'omega_d2i_D']
         for field in self.fields:
             self.data[field] = []  # We will later split into channels per plot
 
