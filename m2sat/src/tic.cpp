@@ -298,13 +298,9 @@ int SetTicSettings(int fd, uint8_t address)
     tic_set_max_deccel(fd, address, STEPPER_MAX_DECELL_PPS2*PPS2_UNIT_CONVERSION);
     tic_set_max_speed(fd, address, STEPPER_MAX_PULSES_PER_SEC*PPS_UNIT_CONVERSION);
     tic_set_starting_speed(fd,address, STEPPER_START_SPEED_PPS*PPS_UNIT_CONVERSION);
-    tic_set_step_mode(fd, address, 2);
-    
-    if (address != 102) {    
-        tic_go_home(fd, address, 0);
-    } else {
-        tic_go_home(fd, address, 1);
-    }
+    tic_set_step_mode(fd, address, 2); // so we get home faster
+    tic_go_home(fd, address, 0);
+
 
     misc_flags_1_t flags;
     flags = tic_get_misc_flags(fd, address);
@@ -323,8 +319,8 @@ int SetTicSettings(int fd, uint8_t address)
 
 int SendAllTicsHome(int fd, const uint8_t *addresses)
 {
-    tic_set_target_position(fd, 100, int32_t(X_OFFSET_FROM_LIMIT_SWITCH_WHOLE_PULSES * STEPPER_STEP_MODE_NUMERIC));
     tic_set_target_position(fd, 101, int32_t(Y_OFFSET_FROM_LIMIT_SWITCH_WHOLE_PULSES * STEPPER_STEP_MODE_NUMERIC));
+    tic_set_target_position(fd, 100, int32_t(X_OFFSET_FROM_LIMIT_SWITCH_WHOLE_PULSES * STEPPER_STEP_MODE_NUMERIC));
     tic_set_target_position(fd, 102, int32_t(Z_OFFSET_FROM_LIMIT_SWITCH_WHOLE_PULSES * STEPPER_STEP_MODE_NUMERIC));
     return 0;
 }

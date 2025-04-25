@@ -5,13 +5,12 @@
 
 using namespace Eigen;
 
-static Matrix<double, 9, Eigen::Dynamic> Phi_stack;
-static Matrix<double, 3, Eigen::Dynamic> Tau_stack; // CL stacks
-static std::vector<Vector<double, 6>> nu; // estimated states time history
-static Vector3d omega_b2i_I_0;
+// static Matrix<double, 9, Eigen::Dynamic> Phi_stack;
+// static Matrix<double, 3, Eigen::Dynamic> Tau_stack; // CL stacks
+// static std::vector<Vector<double, 6>> nu; // estimated states time history
+// static Vector3d omega_b2i_I_0;
 
 static Matrix3d J; // time varying moment of inertia
-Matrix3d R_body2principal; // rotation matrix from eigen decomposition of MoI
 
 // Helper functions
 Vector3d quat_rotate(const Quaterniond& q, const Vector3d& v);
@@ -40,11 +39,11 @@ int SetGains(Matrix3d K_1_, Matrix3d K_2_, Matrix3d K_3_, Matrix3d K_4_, Matrix3
 
 int InitKalmanFilter(Vector3d omega_b2i_measurement, Quaterniond q_i2b_0)
 {
-    nu.emplace_back( (Vector<double,6>() << omega_b2i_measurement,0,0,0).finished() ); // nu_0
-    InitCovariance();   // P_0
+    // nu.emplace_back( (Vector<double,6>() << omega_b2i_measurement,0,0,0).finished() ); // nu_0
+    // InitCovariance();   // P_0
     
     // Obtain the initial angular rates of the BFF w.r. to Inertial in the Inertial Frame
-    omega_b2i_I_0 = quat_rotate(q_i2b_0, omega_b2i_measurement); 
+    // omega_b2i_I_0 = quat_rotate(q_i2b_0, omega_b2i_measurement); 
 
     return 0;
 }
@@ -52,30 +51,6 @@ int InitKalmanFilter(Vector3d omega_b2i_measurement, Quaterniond q_i2b_0)
 int InitController()
 {
     J = J_B;
-    // Compute eigendecomposition to get principal axes
-    // SelfAdjointEigenSolver<Matrix3d> eigensolver(J_B);
-    // if (eigensolver.info() != Eigen::Success) {
-        // std::cerr << "Eigen decomposition failed!" << std::endl;
-        // return -1;
-    // }
-    
-    // Get the matrix of eigenvectors (principal axes)
-    // R_body2principal = eigensolver.eigenvectors();
-    // R_body2principal.col(0) *= -1;  // to match matlab 
-    // R_body2principal.col(1) *= -1;  // to match matlab 
-    // if (R_body2principal.determinant() < 0) {
-        // Flip one column to enforce right-handedness
-        // R_body2principal.col(0) *= -1;  // or col(2), just pick one
-        // std::cout << "flipped to enforce right-handedness\n"; 
-    // }
-
-    // std::cout << R_body2principal << std::endl;
-    // Get the eigenvalues (principal moments of inertia)
-    // Vector3d principal_MoI = eigensolver.eigenvalues();
-    // J_P = principal_MoI.asDiagonal(); // diagonal matrix of principal MOI
-    // J = J_P; // we use J in the code for the controller not J_P but it is same thing
-
-    // exit(-1);
     return 0;
 }
 
@@ -116,8 +91,7 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     static const double rot_trans = M_PI/12.0f;
     if (t.time*1e-3 < T_start)
     {
-        // do nothing to desired trajectory
-        std::cout << "Initial Level" << std::endl;
+        // std::cout << "Initial Level" << std::endl;
     }
     else if (t.time*1e-3 >= T_start && (t.time*1e-3 <  T_offset)) // in the time for the first dip
     {
@@ -126,12 +100,12 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
             rot_trans*M_PI/(2*T_trans)*sin(M_PI/T_trans*(t.time*1e-3 - T_start)),
             0;
         controller_output.omega_d2i_d += added_desired_term;
-        std::cout << "Dip 1" << std::endl;
+        // std::cout << "Dip 1" << std::endl;
     }
     else if (t.time*1e-3 >= T_offset && t.time*1e-3 < T_begin_second_dip)  // stabilize to origin for this long
     {
         // do nothing to desired trajectory
-        std::cout << "Pitched up" << std::endl;
+        // std::cout << "Pitched up" << std::endl;
     }
     else if (t.time*1e-3 >= T_begin_second_dip && t.time*1e-3 < T_begin_second_dip+T_trans) // in the time 
     {
@@ -140,15 +114,11 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
             -rot_trans*M_PI/(2*T_trans)*sin(M_PI/T_trans*(t.time*1e-3 - T_begin_second_dip)), 
             0;
         controller_output.omega_d2i_d += added_desired_term;
-        std::cout << "Dip 2 back down" << std::endl;
+        // std::cout << "Dip 2 back down" << std::endl;
     } else if (t.time*1e-3 >= T_begin_second_dip+T_trans)
     {
         std::cout << "Finished" << std::endl;
     }
-    
-
-    
-    
     
     Vector3d omega_dot_d2i_D = (Vector3d() << 0,0,0).finished(); //0; 0*A*exp(-f*t)*(f*sin(b*t) - b*cos(b*t));0];
     Vector3d omega_dot_d2i_I = quat_rotate(q_i2b, omega_dot_d2i_D); // quat_mult(quat_mult(q_i2d,[0;omega_dot_d2i_D]),quat_conj(q_i2d));
@@ -187,30 +157,19 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
         - 0.5*alpha_1*(skew(q_d2b.vec()) + q_d2b.w()*Matrix3d::Identity())*omega_b2d_B); // desired torque 
 
 
-    std::cout << "alpha_2 Error term: " << (alpha_2*q_d2b.vec()).transpose() << std::endl;
+    // std::cout << "alpha_2 Error term: " << (alpha_2*q_d2b.vec()).transpose() << std::endl;
     // std::cout << "K_1 term: " << (-K_1*Jm_B_dot*(0.5*r - t.omega_b2i_B)).transpose() << std::endl;
-    std::cout << "K_2 Derivative term: " << (K_2*skew(t.omega_b2i_B)*J*t.omega_b2i_B).transpose() << std::endl;
-    std::cout << "K_3 Error term: " << (-K_3*r).transpose() << std::endl;
-    std::cout << "K_4 Derivative term: " << ( K_4*skew(omega_d2i_B)*omega_b2d_B).transpose() << std::endl;
-    std::cout << "Alpha_1 term: " << (alpha_1*(skew(q_d2b.vec()) + q_d2b.w()*Matrix3d::Identity())*omega_b2d_B).transpose() << std::endl;
-    std::cout << "Adaptive term: " << (adaptive_gain*Phi*t.theta_hat).transpose() << std::endl;
+    // std::cout << "K_2 Derivative term: " << (K_2*skew(t.omega_b2i_B)*J*t.omega_b2i_B).transpose() << std::endl;
+    // std::cout << "K_3 Error term: " << (-K_3*r).transpose() << std::endl;
+    // std::cout << "K_4 Derivative term: " << ( K_4*skew(omega_d2i_B)*omega_b2d_B).transpose() << std::endl;
+    // std::cout << "Alpha_1 term: " << (alpha_1*(skew(q_d2b.vec()) + q_d2b.w()*Matrix3d::Identity())*omega_b2d_B).transpose() << std::endl;
+    // std::cout << "Adaptive term: " << (adaptive_gain*Phi*t.theta_hat).transpose() << std::endl;
    
-    /* Project torque to obtainable moment set */
-    // Vector3d scaling_terms; 
-    // scaling_terms << u_com_max_x / std::abs(controller_output.u_com.x()) , 
-    //     u_com_max_y / std::abs(controller_output.u_com.y()),
-    //     u_com_max_z / std::abs(controller_output.u_com.z());
-
-    // double scalar = scaling_terms.minCoeff(); // get scalar we will use to scale torque
-    // controller_output.u_com *= scalar; // scale desired torque
-
-    /* Map control Torque to mass positions */
-    // Transformation of u_com to Commanded Positions as in ref[DOI: 10.2514/1.60380]
+    /* Map control Torque to mass positions */ //Transformation of u_com to Commanded Positions as in ref[DOI: 10.2514/1.60380]
     controller_output.r_mass_commanded = mm_mass_matrix.inverse() * (g_B.cross(controller_output.u_com) / g_B.squaredNorm() ); // desired commanded mass positions
-    // controller_output.r_mass_commanded = R_body2principal.transpose() * controller_output.r_mass_commanded;
-    // at this point, r_mass_commanded is relative to the middle zero position of the sliding masses (not the zero limit switch position)
     /* Make sure r_mass_commanded is within saturation limits (makes sense to apply here before stepper mapping) */
     controller_output.r_mass_commanded = SaturationLimit(controller_output.r_mass_commanded);
+    // at this point, r_mass_commanded is relative to the middle zero position of the sliding masses (not the zero limit switch position)
 
     
     /* Dynamics for desired frame */
@@ -228,7 +187,6 @@ telemetry_t Controller(telemetry_t t, double dt_seconds)
     Vector3d theta_hat_dot =  projected_update(controller_output.theta_hat, Phi, r,
         theta_hat_min,  theta_hat_max);
 
-    // std::cout << "hat dot" << theta_hat_dot.transpose() << std::endl;
     controller_output.theta_hat += theta_hat_dot*dt_seconds; 
 
     /* Compute our actual control torque at the moment for logging */
@@ -287,11 +245,11 @@ Vector3d SaturationLimit(Vector3d r_com)
         saturated_r_com.y() = -m_y_max_pos_meters;
     }
 
-    // z (asymmetric and different since we can only move z negative relative to center of rotation
-    if (saturated_r_com.z() < m_z_max_pos_meters) { // YES less than since max is largest negative value we can achieve
+    // z
+    if (saturated_r_com.z() > m_z_max_pos_meters) {
         saturated_r_com.z() = m_z_max_pos_meters;
-    } else if (saturated_r_com.z() > m_z_min_pos_meters) { // YES greater than since min is smallest negative value we can acheive
-        saturated_r_com.z() = m_z_min_pos_meters;
+    } else if (saturated_r_com.z() < -m_z_max_pos_meters) {
+        saturated_r_com.z() = -m_z_max_pos_meters;
     }
 
     return saturated_r_com;

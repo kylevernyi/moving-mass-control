@@ -55,9 +55,7 @@ FetchContent_MakeAvailable(json)
 
     # Add the executable
 add_executable(m2sat ${sources} ${PROTO_SRCS} ${PROTO_HDRS})
-add_executable(tare_imu tare_imu/main.cpp)
 
 target_link_libraries(m2sat PRIVATE controllers Eigen3::Eigen protobuf::libprotobuf libvncxx zmq nlohmann_json::nlohmann_json)
-target_link_libraries(tare_imu PRIVATE libvncxx)
 
 

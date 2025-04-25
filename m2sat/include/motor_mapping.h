@@ -12,9 +12,6 @@
 
 using namespace Eigen;
 
-static const double z_offset_from_cor = -(85.8+ 70.0f/2.0f)*1e-3; // closest to bottom plate we can get. 71 = distance from CoR to limit switch trigger point
-
-
 /* Motor mapping functions*/
 Vector3d ConvertMotorPositionToMassPosition(int32_t x, int32_t y, int32_t z);
 Vector3d ConvertMotorSpeedToMassVelocity(int32_t xdot, int32_t ydot, int32_t zdot );

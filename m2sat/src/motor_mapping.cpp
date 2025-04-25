@@ -14,7 +14,7 @@ Vector3d ConvertMotorPositionToMassPosition(int32_t x, int32_t y, int32_t z)
     // radians to meters
     double x_pos =   x_rad * X_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000);  
     double y_pos =   y_rad * Y_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000);  
-    double z_pos =   z_rad * Z_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000) + z_offset_from_cor;  // z needs shifted
+    double z_pos =   z_rad * Z_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000);  // z needs shifted
     
     Vector3d output; output << x_pos, y_pos, z_pos;
     return output;
@@ -28,7 +28,7 @@ std::vector<int32_t> ConvertMassPositionToMotorPosition(double x_pos, double y_p
     // Convert the mass position relative to the center of rotation back to the motor's position in radians
     double x_rad = (x_pos) / (X_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000)); // (x_pos) / (X_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM / 1000));
     double y_rad = (y_pos) / (Y_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000)); // (y_pos) / (Y_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM / 1000));
-    double z_rad = (z_pos - z_offset_from_cor) / (Z_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000)); // (z_pos) / (Z_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM / 1000));
+    double z_rad = (z_pos) / (Z_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM/1000)); // (z_pos) / (Z_GEAR_RATIO * (PULLEY_PITCH_RADIUS_MM / 1000));
 
     // Convert radians back to pulses
     int32_t x = int32_t(x_rad * STEPPER_STEPS_PER_REV / TAU) + int32_t(X_OFFSET_FROM_LIMIT_SWITCH_WHOLE_PULSES*STEPPER_STEP_MODE_NUMERIC);
