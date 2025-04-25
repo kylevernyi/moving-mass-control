@@ -471,27 +471,6 @@ u_com = P*cross(omega_b2i_B,J*omega_b2i_B) - P*Phi*theta_hat...
     - K*P*r - diag((P*theta_hat).^2)*r;
 
 
-% f1 = P*diag((theta_hat).^2)
-% f2 = diag(P*(theta_hat).^2)
-% theta-theta_hat
-% (theta-theta_hat).^2
-% 
-% P*[0;0;1]
-% g_B
-% f3 = diag((P*theta_hat).^2)
-% f4 = diag(theta_hat)*P*theta_hat
-% det(f1)
-% f2 = P*[theta_hat(1)^2;0;0]
-% f3= P*[0;theta_hat(2)^2;0]
-% f4 = P*[0;0;theta_hat(3)^2]
-%P*diag(theta_hat.^2)
-%det(P*diag(theta_hat.^2))
-
-%u_com = P*u_com;
-u_com_check = quat_mult(quat_mult(q_i2b,[0;u_com]),quat_conj(q_i2b));
-%u_com_check(4) = 0;
-%u_com = quat_mult(quat_mult(quat_conj(q_i2b),u_com_check),q_i2b);
-%u_com = u_com(2:4);
 % Transformation of u_com to Commanded Positions as in ref[DOI: 10.2514/1.60380]
 r_com = m\(cross(g_B,u_com)/(norm(g_B)^2));
 % Real control applied to the system w/ moving masses

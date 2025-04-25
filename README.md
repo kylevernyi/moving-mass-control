@@ -1,7 +1,12 @@
 # moving-mass-control
+Moving Mass for Satellite Attitude Tracking (M2SAT)
 
-## Prerequisite
+## Prerequisite Set Up Sub-Repos
 git submodule init
 git submodule update
 
-sudo apt install libeigen3-dev libzmq3-dev
+## Main Software Dependencies 
+sudo dnf install protobuf-compiler protobuf-devel eigen3-devel cppzmq-devel zeromq-devel
+
+### Groundstation
+pip install pyqtgraph zmq protobuf

@@ -22,54 +22,47 @@ PLOT_CONFIGS = [
     {
         'field': 'omega_b2i',
         'channels': 3,
-        'title': 'Body Rates',
+        'title': 'Body Rates (rad/s)',
         'overlay': None,
-        'ylim': [-5, 5]
+        'ylim': [-np.pi, np.pi]
     },
     {
-        'field': 'q_i2b',
+        'overlay_pair': ('q_i2b', 'q_i2d'),
         'channels': 4,
-        'title': 'Body Quaternion',
+        'title': 'Body (q_i2b) and Desired (q_i2d) Quat',
         'overlay': None,
-        'ylim': [-1, 1]
-    },
-    {
-        'field': 'q_i2d',
-        'channels': 4,
-        'title': 'Desired Quaternion',
-        'overlay': None,
-        'ylim': [-1, 1]
+        'ylim': [-1.1, 1.1]
     },
     {
         'overlay_pair': ('r_mass', 'r_mass_commanded'),
         'channels': 3,
-        'title': 'Mass Position',
-        'ylim': [-.5, .5]
+        'title': 'Mass Position (m)',
+        'ylim': [-.08, .08]
     },
     {
         'field': 'rdot_mass',
         'channels': 3,
-        'title': 'Mass Velocity',
+        'title': 'Mass Velocity (m/s)',
         'overlay': None,
-        'ylim': [-5, 5]
+        'ylim': [-.5, .5]
     },
     {
         'overlay_pair': ('u_actual', 'u_com'),
         'channels': 3,
-        'title': 'Control Input',
-        'ylim': [-1, 1] # check this
+        'title': 'Control Input (Nm)',
+        'ylim': [-.2, 0.35] # check this
     },
     {
         'field': 'theta_hat',
         'channels': 3,
-        'title': 'Uncertainty Estimations vs Time',
+        'title': 'Uncertainty Estimate (m)',
         'overlay': None, 
-        'ylim': [-1, 1] # check this 
+        'ylim': [-0.1, 0.1] # check this 
     },
     {
         'field': 'omega_d2i_D',
         'channels': 3,
-        'title': 'omega_d2i_D',
+        'title': 'Desired Trajectory Rates (rad/s)',
         'overlay': None,
         'ylim': [-1, 1] # check this 
     }
@@ -142,13 +135,22 @@ class MultiTelemetryPlotter:
             grid_index += 1
 
             p = self.win.addPlot(row=row, col=col, title=config['title'])
-            p.setLabel('bottom', 'Time')
+            p.setTitle(config['title'], color='w', size='22pt')
+            p.setLabel('bottom', 'Time (sec)', color='w', size='2pt')
             # Show major grid lines for x and y
-            p.showGrid(x=True, y=True, alpha=0.25)
+            p.showGrid(x=True, y=True, alpha=0.75)
+
+                # Customize title with white text and larger font
+
+            # Customize axis labels with white text and font size
+            # p.setLabel('bottom', 'Time (s)', )
+            # p.setLabel('left', '', color='w', size='12pt')  # Optional: set left label
+
+
             # Optionally, adjust tick spacing for minor ticks:
             # p.getAxis('bottom').setTickSpacing(major=10, minor=5)
             
-            # p.setYRange(config['ylim'][0], config['ylim'][1])
+            p.setYRange(config['ylim'][0], config['ylim'][1])
             # p.enableAutoRange(axis='y', enable=False)  # Disable auto-scaling for Y-axis
             # num_ticks = 7 # Number of ticks including min and max
             # ytick_positions = np.linspace(config['ylim'][0], config['ylim'][1], num_ticks)

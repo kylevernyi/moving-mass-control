@@ -1,5 +1,13 @@
 m2sat/build/*
-
+**/build/**
+**/controllers/build/**
+**/cppzmq/build/**
+*.asv
+**/plots/
+**/vnproglib/**/build/**
+**/.vscode/**
+**/papers/**
+**/matlab/**
 # Prerequisites
 *.d
 
