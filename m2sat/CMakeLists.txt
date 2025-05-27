@@ -19,6 +19,7 @@ set(sources
 add_subdirectory(controllers)
 add_subdirectory(vnproglib/cpp libvncxx)
 add_subdirectory(cppzmq REQUIRED)
+include_directories(Eigen3)
 
 # find_package(ZeroMQ REQUIRED) 
 find_package(Eigen3 REQUIRED) # Find Eigen3
