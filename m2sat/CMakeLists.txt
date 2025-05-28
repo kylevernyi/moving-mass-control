@@ -19,7 +19,7 @@ set(sources
 add_subdirectory(controllers)
 add_subdirectory(vnproglib/cpp libvncxx)
 add_subdirectory(cppzmq REQUIRED)
-add_subdirectory(Eigen3/cmake)
+add_subdirectory(Eigen3)
 
 
 
