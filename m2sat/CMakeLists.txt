@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
+# Only to compile in windows
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/VCPKG/vcpkg/scripts/buildsystems/vcpkg.cmake"
+    CACHE STRING "Vcpkg toolchain file")
+
 # Set project name
 project(m2sat)
 set(CMAKE_BUILD_TYPE RELEASE)
@@ -19,7 +23,6 @@ set(sources
 add_subdirectory(controllers)
 add_subdirectory(vnproglib/cpp libvncxx)
 add_subdirectory(cppzmq REQUIRED)
-add_subdirectory(Eigen3)
 
 
 
